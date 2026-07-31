@@ -9,3 +9,9 @@ dist/
 .vscode/
 *.swp
 *.swo
+
+# Migrations
+backend/supabase/migration.sql
+backend/run_migration.py
+backend/apply_migration.py
+docs/db_migration_conversion.sql
