@@ -30,27 +30,38 @@ def _call_gemini(msgs, timeout=10):
     r.raise_for_status()
     return r.json()["candidates"][0]["content"]["parts"][0]["text"]
 
-def _call_openai(msgs, timeout=120):
+def _call_openai(msgs, timeout=120, model=None):
     client = OpenAI(
         api_key=settings.nvidia_api_key,
         base_url=settings.nvidia_base_url,
         timeout=timeout,
     )
     chat = client.chat.completions.create(
-        model=settings.nvidia_model_name,
+        model=model or settings.nvidia_model_name,
         messages=msgs,
         temperature=0.5,
         max_tokens=2048,
     )
     return chat.choices[0].message.content
 
+def invoke_vision(msgs, overall_timeout=120):
+    """Call NVIDIA vision model. msgs should carry image_url content blocks."""
+    try:
+        return _call_openai(msgs, timeout=min(overall_timeout, 120), model=settings.nvidia_vision_model_name)
+    except Exception:
+        # Fall back to Gemini inline image if NVIDIA vision is unavailable.
+        return _call_gemini(msgs, timeout=min(overall_timeout, 10))
+
 def invoke_llm(msgs, overall_timeout=180):
     start = time.time()
     try:
-        return _call_gemini(msgs, timeout=10)
-    except (httpx.TimeoutException, TimeoutError, Exception):
+        return _call_openai(msgs, timeout=min(overall_timeout, 120))
+    except Exception:
         pass
     remaining = overall_timeout - (time.time() - start)
     if remaining < 5:
         raise TimeoutError("LLM timed out")
-    return _call_openai(msgs, timeout=min(remaining, 120))
+    try:
+        return _call_gemini(msgs, timeout=min(remaining, 10))
+    except Exception:
+        raise TimeoutError("LLM timed out")

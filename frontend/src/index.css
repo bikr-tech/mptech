@@ -230,6 +230,11 @@
   100% { background-position: 200% 0; }
 }
 
+@keyframes pipeline-step {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); border-color: rgb(59 130 246 / 0.3); }
+  50% { opacity: 1; transform: scale(1); border-color: rgb(59 130 246 / 1); }
+}
+
 /* ── Touch target min (mobile) ── */
 @layer base {
   button, a, input, select, textarea {

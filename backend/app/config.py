@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     nvidia_api_key: str = ""
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
     nvidia_model_name: str = "meta/llama-3.1-70b-instruct"
+    nvidia_vision_model_name: str = "meta/llama-3.2-90b-vision-instruct"
     site_url: str = "http://localhost:5173"
     # Comma-separated list of allowed CORS origins, e.g. "http://localhost:5173,https://mptechsolution-frontend.onrender.com"
     cors_origins: str = "http://localhost:5173"

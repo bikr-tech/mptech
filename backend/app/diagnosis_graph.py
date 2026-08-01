@@ -11,7 +11,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
-from .llm_router import invoke_llm
+from .llm_router import invoke_llm, invoke_vision
 
 
 class PlumbingHITLState(TypedDict):
@@ -53,7 +53,7 @@ def visual_inspection_node(state: PlumbingHITLState) -> dict:
         ]}
     ]
     try:
-        text = invoke_llm(prompt)
+        text = invoke_vision(prompt)
         findings = text.strip()
         return {"visual_findings": findings, "error": None}
     except Exception as e:
