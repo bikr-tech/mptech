@@ -5,9 +5,10 @@ from app.routers import sections, agent
 
 app = FastAPI(title="Plumbing CMS API", version="1.0.0")
 
+origins = settings.cors_origin_list
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.site_url],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
