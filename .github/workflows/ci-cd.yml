@@ -46,6 +46,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy backend service
-        run: curl -fsS "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL }}" >/dev/null
+        run: curl -v -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL }}" >/dev/null
       - name: Deploy frontend static site
-        run: curl -fsS "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL }}" >/dev/null
+        run: curl -v -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL }}" >/dev/null
