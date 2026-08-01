@@ -47,9 +47,12 @@ def test_question_generator_empty_on_error():
 
 
 @patch("app.diagnosis_graph.invoke_llm")
-def test_full_graph_interrupt_resume(mock):
-    mock.side_effect = [
+@patch("app.diagnosis_graph.invoke_vision")
+def test_full_graph_interrupt_resume(mock_vision, mock):
+    mock_vision.side_effect = [
         "Copper pipe with green corrosion near the joint.",  # visual inspection
+    ]
+    mock.side_effect = [
         '["Is the leak active now?", "What is the water temperature?"]',  # questions
         '{"diagnosis": "Failed solder joint", "root_cause": "Corroded copper joint", '
         '"severity": "MEDIUM", "is_diy_safe": true, "diy_instructions": ["Shut off water", "Sand the joint"], '

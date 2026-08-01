@@ -15,15 +15,50 @@ const SEVERITY_STYLE = {
   CRITICAL: 'bg-emergency-500/20 text-emergency-500 border-emergency-500/40',
 }
 
-function LoadingOverlay({ message }) {
+const PIPELINE_STEPS = {
+  start: ['Analyzing visual features…', [
+    'Scanning photo for pipes & components',
+    'Detecting corrosion, leaks, blockages',
+  ]],
+  resume: ['Analyzing your answers…', [
+    'Cross-referencing your answers with visual data',
+    'Running safety & cost analysis',
+  ]],
+}
+
+function LoadingOverlay({ message, phase }) {
+  const [title, steps] = phase === 'resume'
+    ? PIPELINE_STEPS.resume
+    : PIPELINE_STEPS.start
+
   return (
     <div className="flex flex-col items-center justify-center py-10">
-      <div className="w-16 h-16 relative mb-4">
-        <div className="absolute inset-0 border-4 border-brand-accent/30 rounded-full" />
-        <div className="absolute inset-0 border-4 border-transparent border-t-brand-accent rounded-full animate-spin" />
+      <div className="relative mb-6">
+        {/* outer ripple */}
+        <div className="absolute inset-0 rounded-full border-4 border-brand-accent/20 animate-ping" />
+        <div className="w-20 h-20 relative flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full border-4 border-brand-accent/30" />
+          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-brand-accent animate-spin" />
+          <span className="text-3xl">🔧</span>
+        </div>
       </div>
-      <p className="text-white text-lg font-semibold">{message}</p>
-      <p className="text-slate-400 text-sm mt-1">Running our AI plumbing expert pipeline</p>
+
+      <p className="text-white text-lg font-semibold mb-1">{message || title}</p>
+      <p className="text-slate-400 text-sm mb-6">Running our AI plumbing expert pipeline</p>
+
+      <div className="w-full max-w-xs space-y-2.5">
+        {steps.map((step, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <span
+              className="flex items-center justify-center rounded-full border border-brand-accent/30 px-2 py-0.5 text-[11px] font-bold text-primary-300"
+              style={{ animation: `pipeline-step 1.6s ease-in-out ${i * 0.45}s infinite` }}
+            >
+              {i + 1}
+            </span>
+            <span className="text-slate-300 text-sm">{step}</span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -297,7 +332,7 @@ export default function AIDiagnosisBlock({ content }) {
             <UploadZone onFileSelected={handleFileSelected} isDragging={false} onDragState={() => {}} />
           )}
 
-          {step === 'analyzing' && <LoadingOverlay message={analyzingMessage} />}
+          {step === 'analyzing' && <LoadingOverlay message={analyzingMessage} phase={phase} />}
 
           {step === 'error' && (
             <div className="space-y-4">
