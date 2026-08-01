@@ -47,3 +47,5 @@ jobs:
     steps:
       - name: Deploy backend service
         run: curl -fsS "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" >/dev/null
+      - name: Deploy frontend static site
+        run: curl -fsS "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL }}" >/dev/null
