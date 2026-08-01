@@ -6,7 +6,19 @@
       "Bash(npx vite *)",
       "Bash(curl -s http://localhost:5175/)",
       "Bash(curl -s http://localhost:8000/api/sections/public)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(python -c \"from langgraph.types import Command, interrupt; print\\('Command+interrupt OK'\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(python -c \"from app.main import app; from app.diagnosis_graph import build_diagnosis_graph; g = build_diagnosis_graph\\(\\); print\\('graph nodes:', list\\(g.get_graph\\(\\).nodes\\)\\); print\\('OK'\\)\")",
+      "Bash(python -c \"import multipart; print\\('multipart', multipart.__version__\\)\")",
+      "Bash(pip show *)",
+      "Bash(python -c \"from app.main import app; from app.diagnosis_graph import build_diagnosis_graph; g = build_diagnosis_graph\\(\\); print\\('nodes:', sorted\\(g.get_graph\\(\\).nodes\\)\\); print\\('OK'\\)\")",
+      "Bash(python -m pytest tests/test_diagnose.py -q)",
+      "Bash(python -m pytest tests/test_diagnose.py::test_question_generator_empty_on_error -q)",
+      "Bash(python -m pytest tests/test_diagnose.py::test_question_generator_empty_on_error)",
+      "Bash(python -m pytest tests/test_diagnose.py::test_question_generator_empty_on_error -v)",
+      "Bash(python -m pytest tests/ -q)",
+      "Bash(curl -s --max-time 200 -X POST -H \"Content-Type: application/json\" -d @resume_body.json http://localhost:8000/api/diagnose/resume)"
     ]
   }
 }
