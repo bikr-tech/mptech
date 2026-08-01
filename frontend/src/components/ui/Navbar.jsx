@@ -57,6 +57,7 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-8 text-sm" ref={linksRef}>
           <a href="#services" className="text-slate-300 hover:text-white transition-colors">Services</a>
+          <a href="#ai-diagnosis" className="text-slate-300 hover:text-white transition-colors">AI Diagnosis</a>
           <a href="#reviews" className="text-slate-300 hover:text-white transition-colors">Reviews</a>
           <a href="#projects" className="text-slate-300 hover:text-white transition-colors">Projects</a>
           <a href="tel:+15551234567" className="bg-brand-copper hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-xs">
@@ -81,6 +82,7 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-6 py-4 space-y-3">
           <a href="#services" onClick={() => setMenuOpen(false)} className="block text-slate-300 hover:text-white transition-colors">Services</a>
+          <a href="#ai-diagnosis" onClick={() => setMenuOpen(false)} className="block text-slate-300 hover:text-white transition-colors">AI Diagnosis</a>
           <a href="#reviews" onClick={() => setMenuOpen(false)} className="block text-slate-300 hover:text-white transition-colors">Reviews</a>
           <a href="#projects" onClick={() => setMenuOpen(false)} className="block text-slate-300 hover:text-white transition-colors">Projects</a>
           <a href="tel:+15551234567" className="block bg-brand-copper text-white px-4 py-2 rounded-lg text-center font-semibold">

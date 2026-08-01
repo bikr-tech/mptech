@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     site_url: str = "http://localhost:5173"
     # Comma-separated list of allowed CORS origins, e.g. "http://localhost:5173,https://mptechsolution-frontend.onrender.com"
     cors_origins: str = "http://localhost:5173"
+    # Diagnosis image storage
+    storage_bucket: str = "diagnosis-images"
+    max_upload_mb: int = 10
 
     @property
     def cors_origin_list(self) -> list[str]:
