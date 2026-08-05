@@ -47,3 +47,20 @@ export async function generateScene(prompt) {
 export async function reviewContent(threadId, sectionType, humanEdits, approved) {
   return api('/agent/review', { method: 'POST', body: JSON.stringify({ thread_id: threadId, section_type: sectionType, human_edits: humanEdits, approved }) })
 }
+
+// ── HITL Plumbing Diagnosis ────────────────────────────────────────────────
+
+export async function diagnoseStart(imageFile) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const form = new FormData()
+  form.append('file', imageFile)
+  const headers = {}
+  if (session) headers['Authorization'] = `Bearer ${session.access_token}`
+  const res = await fetch(`${BASE}/diagnose/start`, { method: 'POST', body: form, headers })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+export async function diagnoseResume(threadId, userAnswers) {
+  return api('/diagnose/resume', { method: 'POST', body: JSON.stringify({ thread_id: threadId, user_answers: userAnswers }) })
+}
