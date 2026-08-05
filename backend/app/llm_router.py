@@ -21,14 +21,29 @@ def _content_parts(content):
     return parts
 
 
-def _call_gemini(msgs, timeout=10):
+def _call_gemini(msgs, timeout=10, generation_config=None):
     contents = [{"role": m["role"], "parts": _content_parts(m["content"])} for m in msgs]
+    payload = {"contents": contents}
+    if generation_config:
+        payload["generationConfig"] = generation_config
     with httpx.Client(timeout=timeout) as c:
-        r = c.post(GEMINI_URL, json={"contents": contents})
+        r = c.post(GEMINI_URL, json=payload)
     if r.status_code == 429:
         raise TimeoutError("Gemini rate limited")
     r.raise_for_status()
     return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+
+def invoke_gemini(msgs, timeout=30, response_schema=None):
+    """Direct Gemini call with structured-JSON output (used by image guardrails).
+
+    Returns JSON text; the caller parses with extract_json + pydantic. Optional
+    responseSchema is passed only if proven reliable at runtime (ponytail: the
+    JSON-text + pydantic path is the dependable default).
+    """
+    generation_config = {"responseMimeType": "application/json"}
+    if response_schema:
+        generation_config["responseSchema"] = response_schema
+    return _call_gemini(msgs, timeout=timeout, generation_config=generation_config)
 
 def _call_openai(msgs, timeout=120, model=None):
     client = OpenAI(

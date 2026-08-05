@@ -77,6 +77,14 @@ function DiagnosisResult({ result, onSeePlumbers, onReset }) {
         <div>
           <p className="text-white text-lg font-bold leading-tight">{result.diagnosis || 'Diagnosis'}</p>
           {result.root_cause && <p className="text-slate-400 text-xs mt-1">Root cause: {result.root_cause}</p>}
+          {result.label && (
+            <p className="text-slate-500 text-xs mt-1">
+              Detected: {result.label}
+              {typeof result.relevance_confidence === 'number' && (
+                <span className="text-brand-copper font-medium"> · {Math.round(result.relevance_confidence * 100)}% sure</span>
+              )}
+            </p>
+          )}
         </div>
         <span className={`shrink-0 px-3 py-1 rounded-full border text-xs font-bold uppercase ${badge}`}>
           {severity}
@@ -219,7 +227,7 @@ function UploadZone({ onFileSelected, isDragging, onDragState, disabled }) {
 
 export default function AIDiagnosisBlock({ content }) {
   const { headline, subheadline, upload_cta, urgency_text } = content || {}
-  const [step, setStep] = useState('upload') // upload | analyzing | questions | results | error
+  const [step, setStep] = useState('upload') // upload | analyzing | questions | results | rejected | error
   const [phase, setPhase] = useState('') // 'start' | 'resume'
   const [file, setFile] = useState(null)
   const [imageUrl, setImageUrl] = useState('')
@@ -256,7 +264,11 @@ export default function AIDiagnosisBlock({ content }) {
     setSubmitting(true)
     try {
       const data = await diagnoseStart(f)
-      if (data.status === 'NEEDS_CLARIFICATION') {
+      if (data.status === 'REJECTED') {
+        // Guardrail refused the image (not plumbing / couldn't verify).
+        setResult(data)
+        setStep('rejected')
+      } else if (data.status === 'NEEDS_CLARIFICATION') {
         setSession(data)
         setImageUrl(data.image_url || '')
         setStep('questions')
@@ -334,6 +346,23 @@ export default function AIDiagnosisBlock({ content }) {
 
           {step === 'analyzing' && <LoadingOverlay message={analyzingMessage} phase={phase} />}
 
+          {step === 'rejected' && result && (
+            <div className="space-y-4">
+              <div className="bg-amber-500/10 border border-amber-500/50 rounded-xl p-4 text-center">
+                <div className="text-4xl mb-2">🔍</div>
+                <p className="text-amber-400 font-semibold">We couldn't detect a plumbing issue in this photo</p>
+                <p className="text-slate-300 text-sm mt-2">{result.refusal_reason}</p>
+                {result.label && (
+                  <p className="text-slate-500 text-xs mt-2">AI thought: "{result.label}"</p>
+                )}
+              </div>
+              <button onClick={handleReset}
+                className="w-full bg-brand-copper hover:bg-amber-600 text-white font-bold py-3.5 px-6 rounded-xl transition-all">
+                Try Another Photo
+              </button>
+            </div>
+          )}
+
           {step === 'error' && (
             <div className="space-y-4">
               <div className="bg-emergency-500/10 border border-emergency-500/50 rounded-xl p-4">
@@ -351,7 +380,7 @@ export default function AIDiagnosisBlock({ content }) {
             <DiagnosisResult result={result} onSeePlumbers={handleSeePlumbers} onReset={handleReset} />
           )}
 
-          {urgency_text && step !== 'results' && step !== 'questions' && (
+          {urgency_text && step !== 'results' && step !== 'questions' && step !== 'rejected' && (
             <p className="text-amber-400 text-sm text-center mt-4 font-medium animate-pulse">
               {urgency_text}
             </p>

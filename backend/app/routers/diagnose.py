@@ -3,6 +3,7 @@ import re
 import uuid
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi.responses import JSONResponse
 from langgraph.types import Command
 from pydantic import BaseModel
 
@@ -66,6 +67,22 @@ async def start_diagnosis(file: UploadFile = File(...)):
         raise HTTPException(500, f"Diagnosis pipeline error: {e}")
 
     state = graph.get_state(config)
+    refusal = state.values.get("refusal_reason")
+    validation = state.values.get("validation")
+    if refusal:
+        # Guardrail rejected the image — the frontend shows a rejected card and
+        # never reaches clarifying questions. 422 (Unprocessable) matches the
+        # semantic: the image is not a valid diagnosis input.
+        return JSONResponse(status_code=422, content={
+            "status": "REJECTED",
+            "refusal_reason": refusal,
+            "thread_id": thread_id,
+            "image_url": image_url,
+            "visual_findings": state.values.get("visual_findings"),
+            "validation": validation,
+            "label": (validation or {}).get("label"),
+        })
+
     questions = state.values.get("clarifying_questions") or []
     if not questions and not state.values.get("error"):
         raise HTTPException(500, "No clarifying questions were generated.")
@@ -76,6 +93,8 @@ async def start_diagnosis(file: UploadFile = File(...)):
         "questions": questions,
         "image_url": image_url,
         "visual_findings": state.values.get("visual_findings"),
+        "validation": validation,
+        "degraded": state.values.get("degraded"),
         "error": state.values.get("error"),
     }
 
@@ -104,6 +123,10 @@ async def resume_diagnosis(body: ResumeRequest):
         "thread_id": thread_id,
         "status": "COMPLETED",
         "visual_findings": values.get("visual_findings"),
+        "validation": values.get("validation"),
+        "degraded": values.get("degraded"),
+        "label": (values.get("validation") or {}).get("label"),
+        "relevance_confidence": (values.get("validation") or {}).get("relevance_confidence"),
         "clarifying_questions": values.get("clarifying_questions"),
         "user_answers": values.get("user_answers"),
         "diagnosis": values.get("diagnosis"),

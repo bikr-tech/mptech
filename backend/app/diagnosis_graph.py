@@ -1,7 +1,8 @@
 """HITL plumbing diagnosis graph.
 
-Pipeline: visual inspection -> clarifying questions -> [interrupt for human] ->
-master diagnosis -> safety audit (DIY / emergency) -> cost estimate.
+Pipeline: visual inspection -> image guardrail (relevance + box verify) ->
+clarifying questions -> [interrupt for human] -> master diagnosis ->
+safety audit (DIY / emergency) -> cost estimate.
 """
 import json
 import re
@@ -11,6 +12,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
+from .diagnosis_guardrails import validate_image
 from .llm_router import invoke_llm, invoke_vision
 
 
@@ -18,6 +20,10 @@ class PlumbingHITLState(TypedDict):
     thread_id: str
     image_url: str
     visual_findings: str
+    validation: Optional[dict]           # DiagnosisValidation as dict
+    box_verification: Optional[dict]     # BoxVerification as dict
+    refusal_reason: Optional[str]
+    degraded: Optional[bool]
     clarifying_questions: list[str]
     user_answers: Optional[dict]
     diagnosis: Optional[str]
@@ -60,7 +66,30 @@ def visual_inspection_node(state: PlumbingHITLState) -> dict:
         return {"visual_findings": "", "error": f"Vision analysis failed: {e}"}
 
 
-# ── Node 2: question generator ─────────────────────────────────────────────
+# ── Node 2: image guardrail (relevance + box cross-verification) ────────────
+def image_guardrail_node(state: PlumbingHITLState) -> dict:
+    """Validate the photo is an actual plumbing issue before asking questions.
+
+    On refusal, routes to END (terminal) — /start returns REJECTED and the
+    frontend never reaches the clarifying-question modal.
+    """
+    findings = state.get("visual_findings", "")
+    validation, refusal, degraded = validate_image(state["image_url"], findings)
+    return {
+        "validation": validation.model_dump() if validation else None,
+        "refusal_reason": refusal,
+        "degraded": degraded,
+        "error": state.get("error"),
+    }
+
+
+def route_after_guardrail(state: PlumbingHITLState) -> Literal["question_generator", "END"]:
+    if state.get("refusal_reason") or not state.get("validation"):
+        return END
+    return "question_generator"
+
+
+# ── Node 3: question generator ─────────────────────────────────────────────
 def question_generator_node(state: PlumbingHITLState) -> dict:
     findings = state.get("visual_findings", "")
     if state.get("error"):
@@ -158,6 +187,7 @@ _diagnosis_checkpointer = MemorySaver()
 def build_diagnosis_graph():
     builder = StateGraph(PlumbingHITLState)
     builder.add_node("visual_inspection", visual_inspection_node)
+    builder.add_node("image_guardrail", image_guardrail_node)
     builder.add_node("question_generator", question_generator_node)
     builder.add_node("human_clarification", human_clarification_node)
     builder.add_node("master_diagnostician", master_diagnostician_node)
@@ -166,7 +196,11 @@ def build_diagnosis_graph():
     builder.add_node("cost_estimator", cost_estimator_node)
 
     builder.add_edge(START, "visual_inspection")
-    builder.add_edge("visual_inspection", "question_generator")
+    builder.add_edge("visual_inspection", "image_guardrail")
+    builder.add_conditional_edges(
+        "image_guardrail", route_after_guardrail,
+        {"question_generator": "question_generator", END: END},
+    )
     builder.add_edge("question_generator", "human_clarification")
     builder.add_edge("human_clarification", "master_diagnostician")
     builder.add_edge("master_diagnostician", "safety_auditor")
