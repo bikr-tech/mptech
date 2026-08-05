@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function StickyConversionBar({ emergencyPhone }) {
+export default function StickyConversionBar({ emergencyPhone, whatsapp }) {
   const [visible, setVisible] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -43,7 +43,7 @@ export default function StickyConversionBar({ emergencyPhone }) {
 
       {/* WhatsApp floating button */}
       <a
-        href="https://wa.me/9779800000000?text=Hi%20PlumbNepal%2C%20I%20need%20plumbing%20help"
+        href={`https://wa.me/${(whatsapp || '9779800000000').replace(/\D/g, '')}?text=Hi%20PlumbNepal%2C%20I%20need%20plumbing%20help`}
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-4 left-4 z-40 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95"
