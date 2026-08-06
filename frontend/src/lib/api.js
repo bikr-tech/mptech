@@ -57,8 +57,13 @@ export async function diagnoseStart(imageFile) {
   const headers = {}
   if (session) headers['Authorization'] = `Bearer ${session.access_token}`
   const res = await fetch(`${BASE}/diagnose/start`, { method: 'POST', body: form, headers })
-  if (!res.ok) throw new Error(await res.text())
-  return res.json()
+  const data = await res.json().catch(() => null)
+  if (!res.ok) {
+    // REJECTED (guardrail refusal) is a handled result, not an error.
+    if (data && data.status === 'REJECTED') return data
+    throw new Error(data?.detail || await res.text())
+  }
+  return data
 }
 
 export async function diagnoseResume(threadId, userAnswers) {

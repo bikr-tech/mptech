@@ -1,4 +1,5 @@
 """Smoke tests for the HITL diagnosis graph (interrupt + resume), no network needed."""
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -46,12 +47,21 @@ def test_question_generator_empty_on_error():
     assert "boom" in result["error"]
 
 
+@patch("app.diagnosis_graph.validate_image")
 @patch("app.diagnosis_graph.invoke_llm")
 @patch("app.diagnosis_graph.invoke_vision")
-def test_full_graph_interrupt_resume(mock_vision, mock):
+def test_full_graph_interrupt_resume(mock_vision, mock, mock_validate):
     mock_vision.side_effect = [
         "Copper pipe with green corrosion near the joint.",  # visual inspection
     ]
+    # Guardrail passes: relevant plumbing, confidence high, box for the fault.
+    mock_validate.return_value = (
+        SimpleNamespace(is_relevant_plumbing=True, relevance_confidence=0.9, label="corroded joint",
+                        fault_label="corrosion", objects_seen=[], bounding_boxes=[], vqa_verdict=[],
+                        explanation="", model_dump=lambda: {"label": "corroded joint"}),
+        None,
+        False,
+    )
     mock.side_effect = [
         '["Is the leak active now?", "What is the water temperature?"]',  # questions
         '{"diagnosis": "Failed solder joint", "root_cause": "Corroded copper joint", '
@@ -89,3 +99,29 @@ def test_route_after_safety():
     assert route_after_safety({"is_diy_safe": True}) == "cost_estimator"
     assert route_after_safety({"is_diy_safe": False}) == "emergency_summary"
     assert route_after_safety({"is_diy_safe": False, "severity": "CRITICAL"}) == "emergency_summary"
+
+
+@patch("app.diagnosis_graph.validate_image")
+@patch("app.diagnosis_graph.invoke_vision")
+def test_graph_refuses_irrelevant_image(mock_vision, mock_validate):
+    """Guardrail refusal terminates before the interrupt (no clarifying questions)."""
+    mock_vision.return_value = "A park with trees and a pond."  # visual inspection
+    mock_validate.return_value = (
+        None,  # no validation object
+        "We couldn't detect a plumbing issue in this photo.",
+        False,
+    )
+
+    graph = build_diagnosis_graph()
+    config = {"configurable": {"thread_id": "t-refuse-1"}}
+    events = list(graph.stream(
+        {"thread_id": "t-refuse-1", "image_url": "https://example.com/img.jpg"},
+        config, stream_mode="updates",
+    ))
+
+    # No interrupt fired; graph ran to completion with a refusal.
+    assert not any("__interrupt__" in e for e in events)
+    state = graph.get_state(config)
+    assert state.next is ()
+    assert state.values["refusal_reason"] == "We couldn't detect a plumbing issue in this photo."
+    assert state.values.get("validation") is None
