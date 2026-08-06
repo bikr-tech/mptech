@@ -61,6 +61,7 @@ export default function PublicPage() {
   const footerSection = sections.find(s => s.type === 'site_footer')
   const emergencySection = sections.find(s => s.type === 'emergency_call')
   const emergencyPhone = emergencySection?.content?.phone || footerSection?.content?.emergency_phone || ''
+  const whatsapp = emergencySection?.content?.whatsapp || ''
   const contentSections = sections.filter(s => s.type !== 'site_footer')
 
   if (loading) {
@@ -95,7 +96,7 @@ export default function PublicPage() {
         return <Block key={section.id} content={merged} />
       })}
       <FooterBlock content={footerSection?.content || {}} />
-      <StickyConversionBar emergencyPhone={emergencyPhone} />
+      <StickyConversionBar emergencyPhone={emergencyPhone} whatsapp={whatsapp} />
     </main>
   )
 }

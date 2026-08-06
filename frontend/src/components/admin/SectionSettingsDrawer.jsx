@@ -53,7 +53,7 @@ function SortableServiceItem({ id, svc, index, onUpdate, onRemove }) {
 const SOCIAL_PLATFORMS = ['facebook', 'twitter', 'instagram', 'youtube', 'linkedin']
 
 const typeDefaults = {
-  emergency_call: { title: '', subtitle: '', phone: '', responseTime: '', serviceHours: '' },
+  emergency_call: { title: '', subtitle: '', phone: '', whatsapp: '', responseTime: '', serviceHours: '' },
   hero_3d: { title: '', subtitle: '', ctaText: '', ctaLink: '' },
   services_grid: { title: '', subtitle: '' },
   reviews: { title: '', subtitle: '' },
@@ -79,6 +79,7 @@ function contentToForm(content, sectionType) {
     secondaryCtaText: content.secondary_cta_text || '',
     secondaryCtaLink: content.secondary_cta_link || '',
     emergencyPhone: content.emergency_phone || content.phone || '',
+    whatsapp: content.whatsapp || '',
     uploadCta: content.upload_cta || '',
     responseTime: content.response_time || '',
     serviceHours: content.service_hours || '',
@@ -130,6 +131,7 @@ function formToContent(form, sectionType, existingContent) {
     base.emergency_header = form.title || base.emergency_header
     base.subtitle = form.subtitle
     base.phone = form.emergencyPhone || form.phone || ''
+    base.whatsapp = form.whatsapp || ''
     base.response_time = form.responseTime || ''
     base.service_hours = form.serviceHours || ''
   }
@@ -593,6 +595,12 @@ export default function SectionSettingsDrawer({ section, isOpen, onClose, onPrev
               <label className="block text-xs text-slate-500 mb-1">Emergency Phone</label>
               <input type="text" value={form.emergencyPhone || ''} onChange={(e) => handleChange('emergencyPhone', e.target.value)}
                 placeholder="(555) 123-4567"
+                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">WhatsApp Number</label>
+              <input type="text" value={form.whatsapp || ''} onChange={(e) => handleChange('whatsapp', e.target.value)}
+                placeholder="+977 9800000000"
                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
             </div>
             <div>
