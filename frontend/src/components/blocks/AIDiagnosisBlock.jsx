@@ -219,7 +219,8 @@ function UploadZone({ onFileSelected, isDragging, onDragState, disabled }) {
         Take Photo / Upload
       </button>
       <p className="text-slate-500 text-xs mt-3">JPEG, PNG, WEBP, HEIC — Max 10MB</p>
-      <input ref={inputRef} type="file" accept="image/*" capture="environment" className="hidden"
+      {/* capture attr omitted: forces camera-only on iOS. Plain chooser shows both camera + photo library. */}
+      <input ref={inputRef} type="file" accept="image/*" className="hidden"
         onChange={(e) => e.target.files[0] && onFileSelected(e.target.files[0])} />
     </div>
   )
