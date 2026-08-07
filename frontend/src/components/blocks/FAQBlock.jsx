@@ -67,12 +67,12 @@ function FAQCategory({ category, questions }) {
       <ul className="space-y-2">
         {questions.map((item, i) => (
           <li key={i}>
-            <details className="group bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden transition-all duration-300 hover:border-slate-600">
-              <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer text-white font-medium text-sm list-none transition-colors duration-200 hover:text-brand-accent [&::-webkit-details-marker]:hidden">
+            <details className="group glass-frost rounded-xl overflow-hidden transition-all duration-300 hover:bg-white/10">
+              <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer text-white font-medium text-sm list-none transition-colors duration-200 hover:text-electric-300 [&::-webkit-details-marker]:hidden">
                 {item.q}
-                <ChevronDown className="w-4 h-4 flex-shrink-0 text-slate-400 transition-transform duration-300 group-open:rotate-180" />
+                <ChevronDown className="w-4 h-4 flex-shrink-0 text-white/40 transition-transform duration-300 group-open:rotate-180" />
               </summary>
-              <div className="px-5 pb-4 text-slate-400 text-sm leading-relaxed border-t border-slate-700/50 pt-3">
+              <div className="px-5 pb-4 text-white/60 text-sm leading-relaxed border-t border-white/10 pt-3">
                 {item.a}
               </div>
             </details>
@@ -106,13 +106,13 @@ export default function FAQBlock({ content }) {
   }, { scope: sectionRef, dependencies: [reduced, categories.length] })
 
   return (
-    <section ref={sectionRef} className="bg-slate-900 py-20 px-4" aria-label="Frequently Asked Questions">
+    <section ref={sectionRef} className="bg-luminous py-20 px-4" aria-label="Frequently Asked Questions">
       <div className="max-w-5xl mx-auto">
         <div ref={headerRef} className="text-center mb-14">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
             {headline || 'Frequently Asked Questions'}
           </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+          <p className="text-white/60 text-lg max-w-2xl mx-auto">
             {subheadline || 'Find answers to common questions about our plumbing services, pricing, AI diagnosis, and more.'}
           </p>
         </div>

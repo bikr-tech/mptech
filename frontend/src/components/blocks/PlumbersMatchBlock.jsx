@@ -10,8 +10,8 @@ function PlumberCard({ plumber, selected, onSelect }) {
   return (
     <button
       onClick={() => onSelect(plumber.id)}
-      className={`w-full text-left bg-slate-800 border rounded-xl p-4 transition-all hover:scale-[1.02] active:scale-[0.98] ${
-        selected ? 'border-brand-accent ring-2 ring-brand-accent/30' : 'border-slate-700 hover:border-slate-600'
+      className={`w-full text-left glass-frost rounded-2xl p-4 transition-all hover:scale-[1.02] active:scale-[0.98] ${
+        selected ? 'ring-2 ring-electric-400/50' : ''
       }`}
     >
       <div className="flex items-center gap-3">
@@ -44,7 +44,7 @@ function PlumberCard({ plumber, selected, onSelect }) {
       {plumber.badges?.length > 0 && (
         <div className="flex gap-2 mt-3">
           {plumber.badges.map((b, i) => (
-            <span key={i} className="text-[10px] text-slate-500 bg-slate-700 px-2 py-0.5 rounded-full">{b}</span>
+            <span key={i} className="text-[10px] text-white/60 bg-white/10 px-2 py-0.5 rounded-full">{b}</span>
           ))}
         </div>
       )}
@@ -79,29 +79,29 @@ export default function PlumbersMatchBlock({ content }) {
 
   const bookStep = showBooking ? (
     <div className="max-w-md mx-auto space-y-4">
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6">
+      <div className="glass-frost rounded-2xl p-6">
         <h3 className="text-white font-bold text-lg mb-4 text-center">Book {defaultPlumbers.find(p => p.id === selectedId)?.name}</h3>
         <div className="space-y-3">
           <div>
             <label className="text-xs text-slate-400 block mb-1">When do you need service?</label>
             <div className="grid grid-cols-2 gap-2">
-              <button className="bg-brand-accent text-white text-sm py-2 rounded-lg font-medium">ASAP</button>
-              <button className="bg-slate-700 text-slate-300 text-sm py-2 rounded-lg">Schedule</button>
+              <button className="btn-3d text-white text-sm py-2 rounded-lg font-medium">ASAP</button>
+              <button className="bg-white/10 text-white/80 text-sm py-2 rounded-lg border border-white/15">Schedule</button>
             </div>
           </div>
           <div>
             <label className="text-xs text-slate-400 block mb-1">Your phone number</label>
-            <input type="tel" placeholder="98XXXXXXXX" className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
+            <input type="tel" placeholder="98XXXXXXXX" className="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-white text-sm placeholder-white/40" />
           </div>
           <div>
             <label className="text-xs text-slate-400 block mb-1">Location</label>
-            <input type="text" placeholder="Enter your address" className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
+            <input type="text" placeholder="Enter your address" className="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-white text-sm placeholder-white/40" />
           </div>
           <div className="flex justify-center gap-3 pt-2">
             <span className="inline-block"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm5 15h-2v-2h-2v-2h-2v2H9v2H7v-2h2v-2h2v-2h2v2h2v2h2v2z'/%3E%3C/svg%3E" alt="eSewa" className="h-6" /></span>
             <span className="inline-block"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm5 15h-2v-2h-2v-2h-2v2H9v2H7v-2h2v-2h2v-2h2v2h2v2h2v2z'/%3E%3C/svg%3E" alt="Khalti" className="h-6" /></span>
           </div>
-          <button className="w-full bg-brand-copper hover:bg-amber-600 text-white font-bold py-3 rounded-lg text-sm transition">
+          <button className="w-full btn-3d text-white font-bold py-3 rounded-lg text-sm transition-all hover:-translate-y-0.5 hover:scale-[1.02] active:scale-95">
             Confirm Booking — Pay Deposit
           </button>
           <p className="text-slate-500 text-xs text-center">Free cancellation up to 1hr before</p>
@@ -111,13 +111,13 @@ export default function PlumbersMatchBlock({ content }) {
   ) : null
 
   return (
-    <section id="plumbers" ref={sectionRef} className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-20 px-4">
+    <section id="plumbers" ref={sectionRef} className="min-h-screen bg-luminous py-20 px-4">
       <div className="max-w-4xl mx-auto">
         <div ref={headerRef} className="text-center mb-10">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
             {headline || 'Available Plumbers Near You'}
           </h2>
-          <p className="text-lg text-slate-300">
+          <p className="text-lg text-white/70">
             {subheadline || 'AI-matched plumbers ready to fix your issue'}
           </p>
         </div>
@@ -134,16 +134,16 @@ export default function PlumbersMatchBlock({ content }) {
               <button
                 disabled={!selectedId}
                 onClick={handleBooking}
-                className="bg-brand-accent hover:bg-blue-600 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold py-4 px-10 rounded-xl text-lg transition-all hover:scale-105 active:scale-95 disabled:cursor-not-allowed shadow-lg"
+                className="btn-3d disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-4 px-10 rounded-full text-lg transition-all hover:-translate-y-0.5 hover:scale-105 active:scale-95"
               >
                 {selectedId ? 'Book This Plumber' : 'Select a Plumber'}
               </button>
-              <p className="text-slate-500 text-xs mt-3">
+              <p className="text-white/50 text-xs mt-3">
                 Price estimate shown upfront. No hidden charges.
               </p>
             </div>
 
-            <div className="flex justify-center gap-6 mt-10 text-xs text-slate-500">
+            <div className="flex justify-center gap-6 mt-10 text-xs text-white/50">
               <span>🔒 Secure payment via eSewa, Khalti, Prabhu Pay</span>
               <span>🔄 Free cancellation up to 1hr before</span>
               <span>✅ Rebooking guarantee if no-show</span>

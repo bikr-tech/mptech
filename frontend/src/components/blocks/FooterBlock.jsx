@@ -10,7 +10,7 @@ export default function FooterBlock({ content }) {
   const { copyright, tagline, socials } = content || {}
 
   return (
-    <footer className="bg-slate-900 border-t border-slate-800 py-10 px-4">
+    <footer className="bg-deep-950/90 backdrop-blur-sm border-t border-white/10 py-10 px-4">
       <div className="max-w-6xl mx-auto">
         {socials && socials.length > 0 && (
           <div className="flex justify-center gap-4 mb-6">
@@ -19,8 +19,8 @@ export default function FooterBlock({ content }) {
               if (!icon) return null
               return (
                 <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
-                  className="w-10 h-10 bg-slate-800 hover:bg-brand-accent rounded-full flex items-center justify-center border border-slate-700 hover:border-brand-accent transition-all group">
-                  <svg viewBox={icon.viewBox} className="w-5 h-5 fill-slate-400 group-hover:fill-white transition">
+                  className="w-10 h-10 glass-frost hover:ring-1 hover:ring-electric-400/40 rounded-full flex items-center justify-center transition-all group">
+                  <svg viewBox={icon.viewBox} className="w-5 h-5 fill-white/60 group-hover:fill-white transition">
                     <path d={icon.path} />
                   </svg>
                 </a>
@@ -28,8 +28,8 @@ export default function FooterBlock({ content }) {
             })}
           </div>
         )}
-        <p className="text-center text-slate-500 text-sm">{copyright || '© All rights reserved.'}</p>
-        {tagline && <p className="text-center text-slate-600 text-xs mt-1">{tagline}</p>}
+        <p className="text-center text-white/50 text-sm">{copyright || '© All rights reserved.'}</p>
+        {tagline && <p className="text-center text-white/40 text-xs mt-1">{tagline}</p>}
       </div>
     </footer>
   )

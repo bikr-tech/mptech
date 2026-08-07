@@ -18,7 +18,7 @@ export default function EmergencyBlock({ content }) {
   }, [valveOpen])
 
   return (
-    <section className="emergency-section relative min-h-screen bg-slate-900 py-16 px-4">
+    <section className="emergency-section relative min-h-screen bg-luminous py-16 px-4">
       <div
         ref={bannerRef}
         className="fixed top-0 left-0 w-full z-50 bg-brand-emergency text-white text-center py-4 shadow-2xl transform -translate-y-full opacity-0"
@@ -34,24 +34,24 @@ export default function EmergencyBlock({ content }) {
         <h2 className="text-3xl md:text-5xl font-bold text-center text-white mb-8">
           Emergency Services
         </h2>
-        <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
+        <p className="text-center text-white/60 mb-12 max-w-2xl mx-auto">
           Turn the valve to activate emergency mode and reveal our 24/7 contact banner
         </p>
 
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div className="h-[400px] rounded-xl overflow-hidden bg-slate-800 border border-slate-700">
+          <div className="h-[400px] rounded-xl overflow-hidden bg-deep-800 border border-white/10">
             <Valve3D
               valveOpen={valveOpen}
               onValveToggle={(open) => setValveOpen(open)}
             />
           </div>
-          <div className="h-[300px] rounded-xl overflow-hidden bg-slate-800 border border-slate-700">
+          <div className="h-[300px] rounded-xl overflow-hidden bg-deep-800 border border-white/10">
             <Gauge3D pressure={valveOpen ? 1 : 0} />
           </div>
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-slate-400 text-sm">
+          <p className="text-white/50 text-sm">
             Pressure: {valveOpen ? 'CRITICAL' : 'NORMAL'} | Valve: {valveOpen ? 'OPEN' : 'CLOSED'}
           </p>
         </div>

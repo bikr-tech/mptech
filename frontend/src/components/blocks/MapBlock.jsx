@@ -32,7 +32,7 @@ function PlumberCard({ plumber }) {
   const initials = plumber.name.split(' ').map(n => n[0]).join('')
 
   return (
-    <div className="relative bg-slate-800/70 backdrop-blur-md border border-slate-700 rounded-xl p-4 hover:border-brand-accent/40 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-accent/5">
+    <div className="relative glass-frost rounded-2xl p-4 hover:ring-1 hover:ring-electric-400/40 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10">
       <div className="flex items-start gap-3 mb-2">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-accent to-brand-copper flex items-center justify-center text-white font-bold text-sm shrink-0">
           {initials}
@@ -63,12 +63,12 @@ function PlumberCard({ plumber }) {
 
 function MapArea({ activeCity, cities, onCityChange }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 h-[250px] md:h-auto md:aspect-[16/10] group hover:scale-[1.02] transition-transform duration-500">
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-deep-950/80 h-[250px] md:h-auto md:aspect-[16/10] group hover:scale-[1.02] transition-transform duration-500">
       <div className="absolute top-3 left-3 z-10">
         <select
           value={activeCity}
           onChange={e => onCityChange(e.target.value)}
-          className="text-xs bg-slate-900/90 backdrop-blur-sm border border-slate-700 text-white rounded-lg px-3 py-1.5 outline-none focus:border-brand-accent cursor-pointer appearance-none pr-7"
+          className="text-xs bg-deep-900/90 backdrop-blur-sm border border-white/10 text-white rounded-lg px-3 py-1.5 outline-none focus:border-electric-400 cursor-pointer appearance-none pr-7"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
             backgroundRepeat: 'no-repeat',
@@ -173,13 +173,13 @@ export default function MapBlock({ content }) {
   }, { scope: sectionRef, dependencies: [reduced] })
 
   return (
-    <section ref={sectionRef} className="bg-slate-900 py-16 md:py-20 px-4">
+    <section ref={sectionRef} className="bg-luminous py-16 md:py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <div ref={headerRef} className="text-center mb-10">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-3">
             {headline || 'Find a Plumber Near You'}
           </h2>
-          <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">
+          <p className="text-white/60 max-w-2xl mx-auto text-sm md:text-base">
             {subheadline || 'Real-time map of available plumbers in your area'}
           </p>
         </div>
@@ -198,8 +198,8 @@ export default function MapBlock({ content }) {
             {mapVisible ? (
               <MapArea activeCity={activeCity} cities={cities} onCityChange={setActiveCity} />
             ) : (
-              <div className="rounded-2xl border border-slate-700 bg-slate-950 h-[250px] md:aspect-[16/10] flex items-center justify-center">
-                <span className="text-slate-600 text-sm">Loading map&hellip;</span>
+              <div className="rounded-2xl border border-white/10 bg-deep-950/80 h-[250px] md:aspect-[16/10] flex items-center justify-center">
+                <span className="text-white/40 text-sm">Loading map&hellip;</span>
               </div>
             )}
           </div>

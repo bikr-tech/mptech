@@ -39,12 +39,12 @@ function ScreenIcon({ name, className = 'w-6 h-6' }) {
 function PhoneMockup() {
   return (
     <div className="relative mx-auto w-[280px] sm:w-[300px]">
-      <div className="relative rounded-[2.5rem] bg-slate-800 border-4 border-slate-600 shadow-2xl shadow-brand-accent/10 overflow-hidden aspect-[9/19]">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10 w-1/3 h-6 bg-slate-900 rounded-b-xl flex items-center justify-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-slate-600" />
-          <div className="w-12 h-1 rounded-full bg-slate-700" />
+      <div className="relative rounded-[2.5rem] bg-deep-800 border-4 border-white/20 shadow-2xl shadow-electric-500/20 overflow-hidden aspect-[9/19]">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10 w-1/3 h-6 bg-deep-950 rounded-b-xl flex items-center justify-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-white/30" />
+          <div className="w-12 h-1 rounded-full bg-white/20" />
         </div>
-        <div className="absolute inset-0 top-6 bottom-6 bg-slate-900">
+        <div className="absolute inset-0 top-6 bottom-6 bg-deep-950">
           <div className="h-full flex flex-col items-center justify-center gap-3 px-4">
             {APP_SCREENS.map((s, i) => (
               <div
@@ -60,7 +60,7 @@ function PhoneMockup() {
             ))}
           </div>
         </div>
-        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-28 h-1 rounded-full bg-slate-600" />
+        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-28 h-1 rounded-full bg-white/30" />
       </div>
     </div>
   )
@@ -96,7 +96,7 @@ export default function AppBlock({ content }) {
   }, { scope: sectionRef, dependencies: [reduced, featureList.length] })
 
   return (
-    <section ref={sectionRef} className="bg-slate-900 py-20 px-4 overflow-hidden">
+    <section ref={sectionRef} className="bg-luminous py-20 px-4 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           <div ref={phoneRef} className="phone-wrapper flex justify-center md:justify-end">
@@ -106,7 +106,7 @@ export default function AppBlock({ content }) {
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
               {headline || 'Your Plumbing Partner in Your Pocket'}
             </h2>
-            <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+            <p className="text-white/60 text-lg mb-8 leading-relaxed">
               {subheadline || 'Download the PlumbNepal app to diagnose issues, book plumbers, track service in real-time, and pay securely — all from your phone.'}
             </p>
             <ul className="space-y-5 mb-10">
@@ -121,17 +121,17 @@ export default function AppBlock({ content }) {
                   </div>
                   <div>
                     <h3 className="text-white font-semibold text-lg">{f.title}</h3>
-                    <p className="text-slate-400 text-sm">{f.description}</p>
+                    <p className="text-white/60 text-sm">{f.description}</p>
                   </div>
                 </li>
               ))}
             </ul>
             <div className="flex flex-wrap gap-4">
-              <a href="#" className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-brand-accent hover:shadow-glow-blue">
+              <a href="#" className="inline-flex items-center gap-2 glass-frost text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-white/15 hover:-translate-y-0.5">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
                 App Store
               </a>
-              <a href="#" className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-brand-copper hover:shadow-glow-copper">
+              <a href="#" className="inline-flex items-center gap-2 glass-frost text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-white/15 hover:-translate-y-0.5">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.807 1.626a1 1 0 0 1 0 1.732l-2.807 1.626L15.206 12l2.492-2.492zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>
                 Google Play
               </a>

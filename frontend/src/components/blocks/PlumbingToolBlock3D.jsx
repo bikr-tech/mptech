@@ -19,10 +19,10 @@ export default function PlumbingToolBlock3D({ content }) {
   if (!enabled) return null
 
   return (
-    <section className="relative w-full py-20 overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
+    <section className="relative w-full py-20 overflow-hidden bg-luminous">
       <div className="container mx-auto px-4 text-center mb-12">
         <h2 className="text-4xl font-bold text-white mb-4">{title}</h2>
-        <p className="text-xl text-slate-300">{subtitle}</p>
+        <p className="text-xl text-white/70">{subtitle}</p>
       </div>
       <div className="h-[500px] w-full">
         <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>

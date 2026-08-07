@@ -7,7 +7,7 @@ function Stars({ rating }) {
   return (
     <div className="flex gap-1 shrink-0">
       {[1, 2, 3, 4, 5].map((s) => (
-        <span key={s} className={s <= rating ? 'text-amber-400' : 'text-slate-600'}>
+        <span key={s} className={s <= rating ? 'text-amber-400' : 'text-white/20'}>
           ★
         </span>
       ))}
@@ -18,7 +18,7 @@ function Stars({ rating }) {
 function ReviewCard({ review, width }) {
   return (
     <div
-      className="bg-slate-900 border border-slate-700 rounded-2xl p-6 md:p-8 shrink-0 mx-3"
+      className="glass-frost rounded-2xl p-6 md:p-8 shrink-0 mx-3"
       style={{ width }}
     >
       <Stars rating={review.rating} />
@@ -93,20 +93,20 @@ export default function ReviewsBlock({ content }) {
 
   if (!reviews || reviews.length === 0) {
     return (
-      <section id="reviews" className="min-h-screen bg-slate-800 py-16 px-4 flex items-center justify-center">
-        <p className="text-slate-500">No reviews yet</p>
+      <section id="reviews" className="min-h-screen bg-luminous py-16 px-4 flex items-center justify-center">
+        <p className="text-white/50">No reviews yet</p>
       </section>
     )
   }
 
   return (
-    <section id="reviews" ref={sectionRef} className="min-h-screen bg-slate-800 py-20 px-4 overflow-hidden">
+    <section id="reviews" ref={sectionRef} className="min-h-screen bg-luminous py-20 px-4 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <div ref={headerRef}>
           <h2 className="text-3xl md:text-5xl font-bold text-center text-white mb-4">
             {title || 'What Our Customers Say'}
           </h2>
-          <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-white/60 mb-12 max-w-2xl mx-auto">
             {subtitle || 'Real reviews from real customers'}
           </p>
         </div>
