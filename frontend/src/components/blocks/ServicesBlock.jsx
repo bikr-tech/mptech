@@ -69,20 +69,20 @@ export default function ServicesBlock({ content }) {
 
   if (!services || services.length === 0) {
     return (
-      <section id="services" className="min-h-screen bg-slate-900 py-16 px-4 flex items-center justify-center">
-        <p className="text-slate-500">No services configured</p>
+      <section id="services" className="min-h-screen bg-luminous py-16 px-4 flex items-center justify-center">
+        <p className="text-white/50">No services configured</p>
       </section>
     )
   }
 
   return (
-    <section id="services" ref={sectionRef} className="min-h-screen bg-slate-900 py-20 px-4">
+    <section id="services" ref={sectionRef} className="min-h-screen bg-luminous py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <div ref={headerRef}>
           <h2 className="text-3xl md:text-5xl font-bold text-center text-white mb-4">
             {title || 'Our Services'}
           </h2>
-          <p className="text-center text-slate-400 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-white/60 mb-12 max-w-2xl mx-auto">
             {subtitle || 'Comprehensive plumbing solutions for residential and commercial properties'}
           </p>
         </div>
@@ -91,11 +91,11 @@ export default function ServicesBlock({ content }) {
           {services.map((svc, i) => (
             <div
               key={i}
-              className="group bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-brand-accent transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-brand-accent/10"
+              className="group glass-frost rounded-2xl p-6 hover:ring-1 hover:ring-electric-400/40 transition-all duration-300 hover:-translate-y-2 hover:bg-white/10"
             >
-              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">{svc.icon || '🔧'}</div>
+              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_0_12px_rgba(79,195,255,0.35)]">{svc.icon || '🔧'}</div>
               <h3 className="text-xl font-semibold text-white mb-2">{svc.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{svc.description}</p>
+              <p className="text-white/60 text-sm leading-relaxed">{svc.description}</p>
             </div>
           ))}
         </div>
@@ -106,7 +106,7 @@ export default function ServicesBlock({ content }) {
               <div className={`text-3xl md:text-4xl font-bold ${stat.color || 'text-brand-accent'}`}>
                 <AnimatedCounter target={stat.target} suffix={stat.suffix || ''} />
               </div>
-              <p className="text-slate-400 text-sm mt-1">{stat.label}</p>
+              <p className="text-white/60 text-sm mt-1">{stat.label}</p>
             </div>
           ))}
         </div>

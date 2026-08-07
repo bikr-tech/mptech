@@ -43,12 +43,12 @@ export default function FinalCTA({ content }) {
   }, { scope: sectionRef, dependencies: [reduced] })
 
   return (
-    <section ref={sectionRef} className="relative w-full py-20 px-4 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-blue-900">
+    <section ref={sectionRef} className="relative w-full py-20 px-4 overflow-hidden bg-luminous">
       <div
         ref={overlayRef}
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(59,130,246,0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, rgba(79,195,255,0.14) 0%, transparent 70%)',
           opacity: 0.3,
         }}
       />
@@ -57,7 +57,7 @@ export default function FinalCTA({ content }) {
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
             {h}
           </h2>
-          <p className="text-lg md:text-xl text-blue-200 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-white/70 mb-8 max-w-2xl mx-auto">
             {sub}
           </p>
         </div>
@@ -65,25 +65,25 @@ export default function FinalCTA({ content }) {
         <div ref={ctaRef} className="flex flex-col items-center justify-center gap-4">
           <a
             href={ctaL}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-glow-blue cta-pulse transition-all hover:scale-105 active:scale-95"
+            className="btn-3d inline-flex items-center gap-2 text-lg font-bold px-8 py-4 rounded-full cta-pulse transition-all hover:-translate-y-0.5 hover:scale-105 active:scale-95"
           >
             {ctaT} →
           </a>
         </div>
 
-        <p className="text-slate-400 text-sm mt-4">
-          📞 or call <a href={`tel:${phone}`} className="text-blue-300 hover:text-blue-200 underline">{phone}</a> for emergency service
+        <p className="text-white/50 text-sm mt-4">
+          📞 or call <a href={`tel:${phone}`} className="text-electric-300 hover:text-electric-200 underline">{phone}</a> for emergency service
         </p>
 
-        <div ref={trustRef} className="mt-8 text-sm text-slate-400">
+        <div ref={trustRef} className="mt-8 text-sm text-white/50">
           {stats}
         </div>
       </div>
 
       <style>{`
         @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1); }
-          50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.2); }
+          0%, 100% { box-shadow: 0 0 20px rgba(79, 195, 255, 0.3), 0 0 40px rgba(79, 195, 255, 0.1); }
+          50% { box-shadow: 0 0 30px rgba(79, 195, 255, 0.5), 0 0 60px rgba(79, 195, 255, 0.2); }
         }
         .cta-pulse { animation: pulse-glow 2s ease-in-out infinite; }
       `}</style>

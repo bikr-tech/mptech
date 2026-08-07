@@ -4,6 +4,8 @@ import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } 
 import { CSS } from '@dnd-kit/utilities'
 import { updateSection, generateContent } from '../../lib/api'
 import { supabase } from '../../lib/supabase'
+import { DEFAULT_FEATURES, DEFAULT_STATS, FEATURE_ICONS, FEATURE_TINTS } from '../../lib/projectDefaults'
+import { normalizeContent } from '../blocks/ProjectGallery'
 
 const ICONS = ['🔧', '🪠', '🚿', '🛁', '🚰', '🔥', '💧', '❄️', '🧊', '🌡️', '⚡', '🔩', '🛠️', '🧹', '🧽', '💦', '🚽', '🧻']
 
@@ -109,6 +111,8 @@ function contentToForm(content, sectionType) {
     base.projects = content.projects?.length ? content.projects : []
     // Also keep legacy images mapping for display fallback
     base.images = content.images || []
+    base.features = content.features?.length ? content.features : []
+    base.stats = content.stats?.length ? content.stats : []
   }
   return base
 }
@@ -154,6 +158,8 @@ function formToContent(form, sectionType, existingContent) {
   if (sectionType === 'project_gallery') {
     if (form.projects?.length) base.projects = form.projects
     if (form.images?.length) base.images = form.images
+    if (form.features?.length) base.features = form.features
+    if (form.stats?.length) base.stats = form.stats
   }
   if (sectionType === 'site_footer') {
     base.copyright = form.copyright
@@ -207,6 +213,9 @@ export default function SectionSettingsDrawer({ section, isOpen, onClose, onPrev
   useEffect(() => {
     if (section) setForm(contentToForm(section.content || {}, section.type))
   }, [section])
+
+  // Debug: surface why projects might be missing (stale section vs empty content)
+  console.log('[SectionSettingsDrawer]', section?.type, '| content projects:', section?.content?.projects?.length, '| form projects:', form.projects?.length)
 
   const firePreview = useCallback((updatedForm) => {
     if (!section || !onPreviewUpdate) return
@@ -505,6 +514,9 @@ export default function SectionSettingsDrawer({ section, isOpen, onClose, onPrev
                   <input type="text" value={project.location || ''} onChange={(e) => updateProject(i, { location: e.target.value })}
                     placeholder="Location (e.g. Kathmandu)" className="w-full bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-xs" />
 
+                  <input list="project-categories" type="text" value={project.category || ''} onChange={(e) => updateProject(i, { category: e.target.value })}
+                    placeholder="Category (e.g. Bathroom Renovation)" className="w-full bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-xs" />
+
                   <textarea value={project.description || ''} onChange={(e) => updateProject(i, { description: e.target.value })}
                     placeholder="Short description" rows={2}
                     className="w-full bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-xs" />
@@ -549,10 +561,68 @@ export default function SectionSettingsDrawer({ section, isOpen, onClose, onPrev
                 </div>
               ))}
 
-              <button onClick={() => handleChange('projects', [...(form.projects || []), { id: 'p' + Date.now(), title: '', location: '', thumbnail: '', images: [], description: '' }])}
+              <button onClick={() => handleChange('projects', [...(form.projects || []), { id: 'p' + Date.now(), title: '', location: '', category: '', thumbnail: '', images: [], description: '' }])}
                 className="w-full border border-dashed border-slate-600 text-slate-400 hover:text-white hover:border-slate-500 rounded-lg py-2 text-xs transition">
                 + Add Project
               </button>
+              <datalist id="project-categories">
+                <option value="Bathroom Renovation" />
+                <option value="Emergency Repair" />
+                <option value="Leak Detection" />
+                <option value="Kitchen Plumbing" />
+                <option value="Water Heater" />
+                <option value="Drain & Sewer" />
+              </datalist>
+
+              {/* Capability tiles (features) */}
+              <div className="border-t border-slate-700 pt-3 mt-4">
+                <label className="block text-xs text-slate-400 mb-2 font-semibold">Capability Tiles</label>
+                <div className="space-y-3">
+                  {(form.features || DEFAULT_FEATURES).map((f, i) => (
+                    <div key={f.id || i} className="bg-slate-700 rounded-lg p-3 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-500 text-sm font-bold">#{i + 1}</span>
+                        <button onClick={() => handleChange('features', (form.features || DEFAULT_FEATURES).filter((_, j) => j !== i))}
+                          className="ml-auto text-slate-500 hover:text-red-400 text-sm font-bold transition">&times;</button>
+                        <select value={f.icon || 'camera'} onChange={(e) => { const next = [...(form.features || DEFAULT_FEATURES)]; next[i] = { ...next[i], icon: e.target.value }; handleChange('features', next) }}
+                          className="bg-slate-600 border border-slate-500 rounded px-1 py-1 text-white text-xs">
+                          {FEATURE_ICONS.map((ic) => <option key={ic} value={ic}>{ic}</option>)}
+                        </select>
+                        <select value={f.tint || 'cyan'} onChange={(e) => { const next = [...(form.features || DEFAULT_FEATURES)]; next[i] = { ...next[i], tint: e.target.value }; handleChange('features', next) }}
+                          className="bg-slate-600 border border-slate-500 rounded px-1 py-1 text-white text-xs">
+                          {FEATURE_TINTS.map((t) => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                      </div>
+                      <input type="text" value={f.title || ''} onChange={(e) => { const next = [...(form.features || DEFAULT_FEATURES)]; next[i] = { ...next[i], title: e.target.value }; handleChange('features', next) }}
+                        placeholder="Tile title" className="w-full bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-xs" />
+                      <textarea value={f.description || ''} onChange={(e) => { const next = [...(form.features || DEFAULT_FEATURES)]; next[i] = { ...next[i], description: e.target.value }; handleChange('features', next) }}
+                        placeholder="Tile description" rows={2}
+                        className="w-full bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-xs" />
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => handleChange('features', [...(form.features || DEFAULT_FEATURES), { id: 'f' + Date.now(), icon: 'camera', tint: 'cyan', title: '', description: '' }])}
+                  className="mt-3 w-full border border-dashed border-slate-600 text-slate-400 hover:text-white hover:border-slate-500 rounded-lg py-2 text-xs transition">
+                  + Add Tile
+                </button>
+              </div>
+
+              {/* Stats band */}
+              <div className="border-t border-slate-700 pt-3 mt-4">
+                <label className="block text-xs text-slate-400 mb-2 font-semibold">Stats Band</label>
+                <div className="space-y-2">
+                  {(form.stats || DEFAULT_STATS).map((s, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <input type="text" value={String(s.value ?? '')} onChange={(e) => { const next = [...(form.stats || DEFAULT_STATS)]; next[i] = { ...next[i], value: e.target.value }; handleChange('stats', next) }}
+                        placeholder="Value" className="w-20 bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-xs" />
+                      <input type="text" value={s.suffix || ''} onChange={(e) => { const next = [...(form.stats || DEFAULT_STATS)]; next[i] = { ...next[i], suffix: e.target.value }; handleChange('stats', next) }}
+                        placeholder="Suffix" className="w-16 bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-xs" />
+                      <input type="text" value={s.label || ''} onChange={(e) => { const next = [...(form.stats || DEFAULT_STATS)]; next[i] = { ...next[i], label: e.target.value }; handleChange('stats', next) }}
+                        placeholder="Label" className="flex-1 bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-xs" />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -575,7 +645,7 @@ export default function SectionSettingsDrawer({ section, isOpen, onClose, onPrev
             <div>
               <label className="block text-xs text-slate-500 mb-1">Emergency Phone</label>
               <input type="text" value={form.emergencyPhone || ''} onChange={(e) => handleChange('emergencyPhone', e.target.value)}
-                placeholder="+977-9800000000"
+                placeholder="+977-9851110441"
                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
             </div>
             <div>
@@ -600,7 +670,7 @@ export default function SectionSettingsDrawer({ section, isOpen, onClose, onPrev
             <div>
               <label className="block text-xs text-slate-500 mb-1">WhatsApp Number</label>
               <input type="text" value={form.whatsapp || ''} onChange={(e) => handleChange('whatsapp', e.target.value)}
-                placeholder="+977 9800000000"
+                placeholder="+977 9851110441"
                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
             </div>
             <div>

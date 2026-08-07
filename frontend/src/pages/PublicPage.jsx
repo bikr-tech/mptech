@@ -66,16 +66,16 @@ export default function PublicPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-slate-400 text-lg">Loading...</div>
+      <div className="min-h-screen bg-luminous flex items-center justify-center">
+        <div className="text-white/60 text-lg">Loading...</div>
       </div>
     )
   }
 
   if (sections.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-slate-500 text-center">
+      <div className="min-h-screen bg-luminous flex items-center justify-center">
+        <div className="text-white/50 text-center">
           <p className="text-2xl mb-2">No content yet</p>
           <p className="text-sm">Check back soon or contact the admin.</p>
         </div>

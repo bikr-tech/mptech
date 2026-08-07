@@ -29,7 +29,7 @@ function Badge({ label, type }) {
     insurance: 'bg-blue-900/40 text-blue-300 border-blue-700',
     background: 'bg-purple-900/40 text-purple-300 border-purple-700',
     guarantee: 'bg-amber-900/40 text-amber-300 border-amber-700',
-    pan: 'bg-slate-800 text-slate-300 border-slate-600',
+    pan: 'bg-white/10 text-white/70 border-white/20',
   }
   return (
     <span className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-medium ${colors[type] || colors.verified}`}>
@@ -78,7 +78,7 @@ export default function TrustBannerBlock({ content }) {
   }, { scope: sectionRef, dependencies: [reduced] })
 
   return (
-    <section id="trust" ref={sectionRef} className="bg-slate-900 py-16 px-4 border-t border-slate-800">
+    <section id="trust" ref={sectionRef} className="bg-luminous py-16 px-4 border-t border-white/10">
       <div className="max-w-6xl mx-auto">
         <div ref={statRef} className="grid grid-cols-3 gap-8 mb-12 text-center">
           {s.map((stat, i) => (
@@ -86,7 +86,7 @@ export default function TrustBannerBlock({ content }) {
               <div className="text-3xl md:text-5xl font-bold text-brand-accent">
                 {stat.value === 4.8 ? '4.8★' : <AnimatedCounter target={stat.value} suffix={stat.suffix || ''} />}
               </div>
-              <p className="text-slate-400 text-sm mt-1">{stat.label}</p>
+              <p className="text-white/60 text-sm mt-1">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -99,11 +99,11 @@ export default function TrustBannerBlock({ content }) {
 
         <div ref={revRef} className="grid md:grid-cols-3 gap-6">
           {r.map((rev, i) => (
-            <div key={i} className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <div key={i} className="glass-frost rounded-2xl p-5">
               <div className="flex gap-1 text-amber-400 text-sm mb-3">
                 {Array.from({ length: rev.rating || 5 }).map((_, s) => <span key={s}>★</span>)}
               </div>
-              <p className="text-slate-300 text-sm italic mb-3">&ldquo;{rev.text}&rdquo;</p>
+              <p className="text-white/75 text-sm italic mb-3">&ldquo;{rev.text}&rdquo;</p>
               <p className="text-brand-copper text-xs font-semibold">— {rev.author}</p>
             </div>
           ))}

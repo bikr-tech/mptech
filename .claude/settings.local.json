@@ -18,7 +18,8 @@
       "Bash(python -m pytest tests/test_diagnose.py::test_question_generator_empty_on_error)",
       "Bash(python -m pytest tests/test_diagnose.py::test_question_generator_empty_on_error -v)",
       "Bash(python -m pytest tests/ -q)",
-      "Bash(curl -s --max-time 200 -X POST -H \"Content-Type: application/json\" -d @resume_body.json http://localhost:8000/api/diagnose/resume)"
+      "Bash(curl -s --max-time 200 -X POST -H \"Content-Type: application/json\" -d @resume_body.json http://localhost:8000/api/diagnose/resume)",
+      "Bash(python check_sections.py)"
     ]
   }
 }
