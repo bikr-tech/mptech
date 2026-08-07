@@ -284,13 +284,18 @@ function PhotoLightbox({ project, onClose }) {
       if (e.key === 'ArrowLeft') setIdx((i) => (i - 1 + imgs.length) % imgs.length)
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
   }, [imgs.length, onClose])
   if (!imgs.length) return null
   const img = imgs[idx]
   return (
-    <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true" aria-label={project.title}>
-      <div className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto" style={{ zIndex: 200 }} onClick={onClose} role="dialog" aria-modal="true" aria-label={project.title}>
+      <div className="relative max-w-4xl w-full my-auto" onClick={(e) => e.stopPropagation()}>
         <img src={img} alt={project.alt || project.title} className="w-full max-h-[80vh] object-contain rounded-2xl border border-white/15 bg-deep-900 shadow-2xl" />
         <div className="flex items-center justify-between mt-4">
           <div className="text-white text-sm">
