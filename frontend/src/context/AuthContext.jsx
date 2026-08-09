@@ -35,12 +35,40 @@ export function AuthProvider({ children }) {
     if (error) throw error
   }
 
+  async function signUp(email, password, role = 'customer') {
+    // Supabase trigger sets profiles.role='customer'; backend sets plumber
+    // role + creates the plumbers row (pending) via service key.
+    const { error } = await supabase.auth.signUp({ email, password })
+    if (error) {
+      const msg = String(error.message || '').toLowerCase()
+      if (msg.includes('rate limit') || msg.includes('too many')) {
+        throw new Error('Too many signup attempts right now. Try again in a few minutes.')
+      }
+      if (msg.includes('already registered') || msg.includes('already been registered')) {
+        throw new Error('An account with this email already exists. Sign in instead.')
+      }
+      if (msg.includes('invalid')) {
+        throw new Error('That email address is not valid. Check for typos.')
+      }
+      throw error
+    }
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api'}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, role }),
+    })
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(text || 'Could not finish creating your account.')
+    }
+  }
+
   async function logout() {
     await supabase.auth.signOut()
   }
 
   return (
-    <AuthContext.Provider value={{ user, role, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, role, loading, login, signUp, logout }}>
       {children}
     </AuthContext.Provider>
   )

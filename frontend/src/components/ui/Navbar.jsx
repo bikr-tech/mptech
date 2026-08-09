@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
+import { useAuth } from '../../context/AuthContext'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '../../lib/animations'
@@ -22,6 +24,7 @@ const NAV_LINKS = [
 ]
 
 export default function Navbar() {
+  const { user, role } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const navRef = useRef(null)
@@ -50,6 +53,9 @@ export default function Navbar() {
       }),
     })
   }, [reduced])
+
+  const authDest = user ? (role === 'admin' ? '/admin' : role === 'plumber' ? '/plumber' : '/account') : '/login'
+  const authLabel = user ? 'My account' : 'Sign in'
 
   // Close overlays on scroll / outside click
   useEffect(() => {
@@ -118,6 +124,16 @@ export default function Navbar() {
           ))}
         </div>
 
+        {/* Auth entry */}
+        {!user && (
+          <Link to="/login?mode=signup" className="hidden md:inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-full btn-3d transition-all hover:-translate-y-0.5">
+            Sign up
+          </Link>
+        )}
+        <Link to={authDest} className="hidden md:inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-full text-white/90 border border-white/20 bg-white/5 backdrop-blur-md transition-all hover:bg-white/15">
+          {authLabel}
+        </Link>
+
         {/* Standalone 3D blue CTA — far right */}
         <a
           href="#ai-diagnosis"
@@ -149,6 +165,14 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
+          {!user && (
+            <Link to="/login?mode=signup" onClick={() => setMenuOpen(false)} className="block text-white/90 hover:text-white text-sm px-3 py-2 rounded-xl hover:bg-white/10 transition-colors">
+              Sign up
+            </Link>
+          )}
+          <Link to={authDest} onClick={() => setMenuOpen(false)} className="block text-white/90 hover:text-white text-sm px-3 py-2 rounded-xl hover:bg-white/10 transition-colors">
+            {authLabel}
+          </Link>
           <a href="#ai-diagnosis" onClick={() => setMenuOpen(false)} className="btn-3d block text-center text-sm font-semibold px-4 py-3 rounded-full">
             Request Diagnosis Now
           </a>

@@ -98,7 +98,7 @@ The frontend `AICopilotDrawer.jsx` and `HumanReviewModal.jsx` handle the review 
 | File | Variables |
 |------|-----------|
 | `frontend/.env` | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |
-| `backend/.env` | `SUPABASE_URL`, `SUPABASE_KEY`, `JWT_SECRET`, `GEMINI_API_KEY`, `NVIDIA_API_KEY`, `SITE_URL` |
+| `backend/.env` | `SUPABASE_URL`, `SUPABASE_KEY`, `JWT_SECRET`, `GEMINI_API_KEY`, `NVIDIA_API_KEY`, `SITE_URL`, `RESEND_API_KEY` (optional), `RESEND_FROM_EMAIL` |
 
 Frontend uses `VITE_` prefix (Vite convention). Backend uses pydantic-settings from `.env`.
 

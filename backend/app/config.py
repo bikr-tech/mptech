@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     # Diagnosis image storage
     storage_bucket: str = "diagnosis-images"
     max_upload_mb: int = 10
+    # Transactional email (Resend). Empty key → email service disabled (no-op).
+    resend_api_key: str = ""
+    resend_from_email: str = "no-reply@mptechsolution.com"
 
     @property
     def cors_origin_list(self) -> list[str]:
