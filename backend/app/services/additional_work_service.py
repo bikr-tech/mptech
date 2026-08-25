@@ -7,6 +7,10 @@ additional work)."""
 from app.database import get_supabase
 from . import audit_service
 from .errors import NotFoundError, ForbiddenError, InvalidOperationError, DuplicateActionError
+from .booking_notifications import (
+    notify_additional_work_requested,
+    notify_additional_work_decision,
+)
 
 
 def request_additional_work(db, work_order_id: str, actor_id: str, actor_role: str, data: dict) -> dict:
@@ -31,6 +35,14 @@ def request_additional_work(db, work_order_id: str, actor_id: str, actor_role: s
     if not res.data:
         raise InvalidOperationError("Failed to create additional work request")
     audit_service.record(actor_id, "additional_work_requested", "additional_work", res.data[0]["id"])
+
+    # Enqueue additional work requested notification
+    try:
+        import asyncio
+        asyncio.create_task(notify_additional_work_requested(wo["booking_id"], res.data[0]["id"]))
+    except RuntimeError:
+        pass
+
     return res.data[0]
 
 
@@ -82,6 +94,14 @@ def approve(db, request_id: str, actor_id: str, actor_role: str, reason: str = "
 
     audit_service.record(actor_id, "additional_work_approved", "additional_work", request_id,
                          {"status": "pending"}, {"status": "approved"})
+
+    # Enqueue additional work approved notification
+    try:
+        import asyncio
+        asyncio.create_task(notify_additional_work_decision(req["booking_id"], request_id, True))
+    except RuntimeError:
+        pass
+
     return res.data[0]
 
 
@@ -96,4 +116,12 @@ def reject(db, request_id: str, actor_id: str, actor_role: str, reason: str = ""
     }).eq("id", request_id).execute()
     audit_service.record(actor_id, "additional_work_rejected", "additional_work", request_id,
                          {"status": "pending"}, {"status": "rejected", "reason": reason})
+
+    # Enqueue additional work rejected notification
+    try:
+        import asyncio
+        asyncio.create_task(notify_additional_work_decision(req["booking_id"], request_id, False))
+    except RuntimeError:
+        pass
+
     return res.data[0]

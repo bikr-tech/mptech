@@ -28,7 +28,9 @@ function DiagnosisEmbed({ onResult }) {
     setBusy(true); setErr(''); setResult(null)
     try {
       const data = await diagnoseStart(f)
-      if (data.status === 'NEEDS_CLARIFICATION') {
+      if (data.error) {
+        setErr(data.error)
+      } else if (data.status === 'NEEDS_CLARIFICATION') {
         setSession(data)
         setQuestions(data.clarifying_questions || [])
       } else if (data.status === 'COMPLETED') {

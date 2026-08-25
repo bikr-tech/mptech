@@ -1,0 +1,16 @@
+<!-- Status Badge - Reusable Component -->
+{%- if status == 'pending' -%}
+<span style="display: inline-block; padding: 4px 12px; background-color: #fef3c7; color: #92400e; border-radius: 9999px; font-size: 12px; font-weight: 600;">Pending</span>
+{%- elif status == 'assigned' -%}
+<span style="display: inline-block; padding: 4px 12px; background-color: #bfdbfe; color: #1e40af; border-radius: 9999px; font-size: 12px; font-weight: 600;">Assigned</span>
+{%- elif status == 'scheduled' -%}
+<span style="display: inline-block; padding: 4px 12px; background-color: #bfdbfe; color: #1e40af; border-radius: 9999px; font-size: 12px; font-weight: 600;">Scheduled</span>
+{%- elif status == 'in-progress' or status == 'en-route' or status == 'arrived' -%}
+<span style="display: inline-block; padding: 4px 12px; background-color: #dcfce7; color: #166534; border-radius: 9999px; font-size: 12px; font-weight: 600;">In Progress</span>
+{%- elif status == 'completed' -%}
+<span style="display: inline-block; padding: 4px 12px; background-color: #d1fae5; color: #065f46; border-radius: 9999px; font-size: 12px; font-weight: 600;">Completed</span>
+{%- elif status == 'cancelled' -%}
+<span style="display: inline-block; padding: 4px 12px; background-color: #fee2e2; color: #991b1b; border-radius: 9999px; font-size: 12px; font-weight: 600;">Cancelled</span>
+{%- else -%}
+<span style="display: inline-block; padding: 4px 12px; background-color: #f3f4f6; color: #374151; border-radius: 9999px; font-size: 12px; font-weight: 600;">{{status}}</span>
+{%- endif -%}

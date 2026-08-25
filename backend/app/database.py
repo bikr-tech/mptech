@@ -10,6 +10,7 @@ def get_supabase() -> Client:
     return _client
 
 _SCHEMA_TABLES = ("bookings", "customers", "plumbers", "work_orders")
+_QUEUE_TABLES = ("email_notifications", "email_job_queue")
 
 
 def require_booking_schema() -> None:
@@ -22,4 +23,16 @@ def require_booking_schema() -> None:
             db.table(t).select("id").limit(1).execute()
         except Exception:
             raise SchemaNotAppliedError(f"Booking table '{t}' is missing.")
+        break
+
+
+def require_queue_schema() -> None:
+    """Guard for the email queue feature: fails fast if queue tables aren't set up."""
+    from app.services.errors import SchemaNotAppliedError
+    db = get_supabase()
+    for t in _QUEUE_TABLES:
+        try:
+            db.table(t).select("id").limit(1).execute()
+        except Exception:
+            raise SchemaNotAppliedError(f"Queue table '{t}' is missing. Run email_notifications.sql in Supabase.")
         break

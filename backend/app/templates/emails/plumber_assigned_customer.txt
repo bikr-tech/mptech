@@ -1,0 +1,19 @@
+Hi {{customer_name}},
+
+Great news! A plumber has been assigned to your booking.
+
+Your Plumber
+============
+Plumber: {{plumber_name}}
+Booking: {{booking_number}}
+Service: {{service_type}}
+Scheduled: {{scheduled_date}} {{scheduled_time}}
+Status: {{status}}
+
+Your plumber will arrive during the scheduled window. You can track the progress in your account:
+{{frontend_url}}/account/bookings/{{booking_id}}
+
+If you need to make any changes, please contact us as soon as possible.
+
+Best regards,
+The {{brand_name}} Team

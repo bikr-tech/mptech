@@ -4,8 +4,9 @@ from uuid import UUID
 
 from app.database import get_supabase
 from . import audit_service
-from .booking_status_service import assert_transition
+from .booking_status_service import assert_transition, can_transition
 from .errors import NotFoundError, ForbiddenError, InvalidTransitionError, AlreadyConfirmedError, InvalidOperationError
+from .booking_notifications import notify_booking_created
 
 # Booking numbers like PN-1001. Counter lives in booking_number seed; we derive
 # from an existing max as a string so no extra table is needed.
@@ -70,6 +71,15 @@ def create_booking(user_id: str, user_role: str, data: dict) -> dict:
     row = res.data[0]
     audit_service.record(user_id, "booking_created", "booking", row["id"], None, {"status": "pending"})
     audit_service.record_status(str(row["id"]), None, "pending", actor_id=user_id, actor_role=user_role)
+
+    # Enqueue booking created notification (async, fire-and-forget)
+    try:
+        import asyncio
+        asyncio.create_task(notify_booking_created(row["id"]))
+    except RuntimeError:
+        # No event loop running (e.g., in tests) - skip notification
+        pass
+
     return row
 
 
@@ -121,7 +131,7 @@ def transition_booking(db, booking: dict, to_status: str, actor_id: str, actor_r
 
 
 def cancel_booking(db, booking: dict, actor_id: str, actor_role: str, reason: str = "") -> dict:
-    if booking["status"] not in ("pending", "admin_review", "scheduled", "assigned", "accepted", "en_route"):
+    if not can_transition(booking["status"], "cancelled"):
         raise InvalidOperationError("Booking can only be cancelled before work is in progress")
     return transition_booking(db, booking, "cancelled", actor_id, actor_role)
 

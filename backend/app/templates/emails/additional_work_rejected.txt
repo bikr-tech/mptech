@@ -1,0 +1,20 @@
+Hi {{plumber_name}},
+
+The customer has rejected the additional work request for booking {{booking_number}}.
+
+Request Rejected
+================
+Booking: {{booking_number}}
+Additional Work: {{additional_work}}
+{% if rejection_reason %}
+Reason: {{rejection_reason}}
+{% endif %}
+
+The additional work will not proceed. Please continue with the original scope of work.
+
+View Job: {{frontend_url}}/plumber/jobs/{{booking_id}}
+
+If you have questions, please contact the admin team.
+
+Best regards,
+The {{brand_name}} Team

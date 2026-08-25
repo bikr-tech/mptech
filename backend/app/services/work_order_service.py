@@ -3,6 +3,12 @@ a client-sent total is ignored (spec §23/§24)."""
 from app.database import get_supabase
 from . import audit_service
 from .errors import NotFoundError, ForbiddenError, InvalidOperationError, DuplicateActionError
+from .booking_notifications import (
+    notify_plumber_accepted,
+    notify_plumber_en_route,
+    notify_plumber_arrived,
+    notify_booking_completed,
+)
 
 # Booking-status → work-order-status for the plumber action endpoints.
 JOB_ACTION_TRANSITIONS = {
@@ -258,6 +264,20 @@ def apply_job_action(db, booking, work_order, action: str, actor_id: str, actor_
                          {"status": booking["status"]}, {"status": new_status})
     audit_service.record_status(str(booking["id"]), booking["status"], new_status, actor_id, actor_role)
 
+    # Enqueue status change notifications
+    try:
+        import asyncio
+        if action == "accept":
+            asyncio.create_task(notify_plumber_accepted(booking["id"]))
+        elif action == "en-route":
+            asyncio.create_task(notify_plumber_en_route(booking["id"]))
+        elif action == "arrived":
+            asyncio.create_task(notify_plumber_arrived(booking["id"]))
+        elif action == "complete":
+            asyncio.create_task(notify_booking_completed(booking["id"]))
+    except RuntimeError:
+        pass
+
     return {"booking_status": new_status, "action": action}
 
 
@@ -287,4 +307,12 @@ def complete_work_order(db, wo_id: str, actor_id: str, actor_role: str, completi
     audit_service.record(actor_id, "job_completed", "booking", booking["id"],
                          {"status": booking["status"]}, {"status": "completed"})
     audit_service.record_status(str(booking["id"]), booking["status"], "completed", actor_id, actor_role)
+
+    # Enqueue completion notification (async, fire-and-forget)
+    try:
+        import asyncio
+        asyncio.create_task(notify_booking_completed(booking["id"]))
+    except RuntimeError:
+        pass
+
     return {"work_order_id": wo_id, "status": "completed"}

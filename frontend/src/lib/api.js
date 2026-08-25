@@ -7,7 +7,22 @@ export async function api(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers }
   if (session) headers['Authorization'] = `Bearer ${session.access_token}`
   const res = await fetch(`${BASE}${path}`, { ...options, headers })
-  if (!res.ok) throw new Error(await res.text())
+  if (!res.ok) {
+    const text = await res.text()
+    let message = text
+    let code = 'ERROR'
+    try {
+      const parsed = JSON.parse(text)
+      if (parsed.error) {
+        code = parsed.error.code
+        message = parsed.error.message
+      }
+    } catch {}
+    const err = new Error(message)
+    err.code = code
+    err.status = res.status
+    throw err
+  }
   if (res.status === 204) return null
   return res.json()
 }
@@ -68,4 +83,8 @@ export async function diagnoseStart(imageFile) {
 
 export async function diagnoseResume(threadId, userAnswers) {
   return api('/diagnose/resume', { method: 'POST', body: JSON.stringify({ thread_id: threadId, user_answers: userAnswers }) })
+}
+
+export async function diagnoseVoiceStart(textInput) {
+  return api('/diagnose/voice_start', { method: 'POST', body: JSON.stringify({ text_input: textInput }) })
 }

@@ -32,7 +32,19 @@ export default function BookingDetails({ bookingId }) {
 
   const b = data.booking
   const work = data.work_order
-  const STATUSES = ['pending', 'admin_review', 'scheduled', 'assigned', 'accepted', 'en_route', 'arrived', 'in_progress', 'awaiting_approval', 'completed', 'customer_confirmed']
+  const STATUSES = [
+  { value: 'pending', label: 'Pending review', icon: '⏳' },
+  { value: 'admin_review', label: 'Admin review', icon: '👁️' },
+  { value: 'scheduled', label: 'Scheduled', icon: '📅' },
+  { value: 'assigned', label: 'Assigned', icon: '👷' },
+  { value: 'accepted', label: 'Accepted', icon: '✅' },
+  { value: 'en_route', label: 'En route', icon: '🚗' },
+  { value: 'arrived', label: 'Arrived', icon: '📍' },
+  { value: 'in_progress', label: 'In progress', icon: '🔧' },
+  { value: 'awaiting_approval', label: 'Awaiting approval', icon: '📋' },
+  { value: 'completed', label: 'Completed', icon: '✨' },
+  { value: 'customer_confirmed', label: 'Customer confirmed', icon: '🤝' },
+]
 
   async function openPlumberPicker(isReassign) {
     try {
@@ -74,19 +86,28 @@ export default function BookingDetails({ bookingId }) {
         <div className="flex items-center gap-2">
           <StatusBadge status={b.status} />
           <div className="relative">
-            <button onClick={() => setStatusMenu(!statusMenu)} className="rounded-lg border border-brand-border px-3 py-1.5 text-sm text-brand-text-secondary">Set status</button>
+            <button onClick={() => setStatusMenu(!statusMenu)} className="rounded-lg border border-brand-border bg-brand-surface px-3 py-1.5 text-sm text-brand-text-secondary flex items-center gap-1.5 hover:bg-brand-bg transition">
+              <span>⚙️</span>
+              <span>Set status</span>
+              <span className="ml-1">▼</span>
+            </button>
             {statusMenu && (
-              <div className="absolute right-0 top-10 z-20 max-h-64 w-52 overflow-y-auto rounded-xl border border-brand-border bg-brand-surface p-1 shadow-xl">
+              <div className="absolute right-0 top-10 z-20 max-h-64 w-56 overflow-y-auto rounded-xl border border-brand-border bg-brand-surface p-1 shadow-xl">
                 {STATUSES.map((s) => (
-                  <button key={s} onClick={() => changeStatus(s)}
-                    className="block w-full rounded-lg px-3 py-1.5 text-left text-sm text-brand-text hover:bg-brand-surface-hover">
-                    {s}
+                  <button key={s.value} onClick={() => changeStatus(s.value)}
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm text-brand-text hover:bg-brand-surface-hover flex items-center gap-2">
+                    <span className="text-base">{s.icon}</span>
+                    <span>{s.label}</span>
+                    <span className="ml-auto text-xs text-brand-text-muted">{s.value}</span>
                   </button>
                 ))}
               </div>
             )}
           </div>
-          <button onClick={cancelIt} className="rounded-lg border border-red-500/40 px-3 py-1.5 text-sm text-red-400">Cancel</button>
+          <button onClick={cancelIt} className="rounded-lg border border-red-500/40 bg-red-500/5 px-3 py-1.5 text-sm text-red-400 flex items-center gap-1.5 hover:bg-red-500/10 transition">
+            <span>✕</span>
+            <span>Cancel</span>
+          </button>
         </div>
       </div>
 

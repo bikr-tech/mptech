@@ -1,0 +1,19 @@
+Hi {{customer_name}},
+
+Your plumber {{plumber_name}} has arrived at your location for booking {{booking_number}}.
+
+Plumber Arrived
+===============
+Booking: {{booking_number}}
+Service: {{service_type}}
+Plumber: {{plumber_name}}
+Status: {{status}}
+
+The plumber will now begin the work. You'll receive a final notification when the job is completed.
+
+Track Progress: {{frontend_url}}/account/bookings/{{booking_id}}
+
+If you have any questions, please don't hesitate to reach out.
+
+Best regards,
+The {{brand_name}} Team

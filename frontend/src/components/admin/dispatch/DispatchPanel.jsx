@@ -6,7 +6,12 @@ import BookingDetails from './BookingDetails'
 import ActiveJobsBoard from './ActiveJobsBoard'
 import PlumberRoster from './PlumberRoster'
 
-const TABS = ['Overview', 'Queue', 'Active jobs', 'Plumbers']
+const TABS = [
+  { id: 'Overview', label: 'Overview', icon: '📊' },
+  { id: 'Queue', label: 'Queue', icon: '📋' },
+  { id: 'Active jobs', label: 'Active', icon: '🔧' },
+  { id: 'Plumbers', label: 'Plumbers', icon: '👷' },
+]
 
 /** Admin dispatch workspace: stats, queue, per-booking detail + assignment. */
 export default function DispatchPanel() {
@@ -18,11 +23,12 @@ export default function DispatchPanel() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-bold text-brand-text">Dispatch</h1>
-        <div className="flex gap-1">
+        <div className="flex gap-1 bg-brand-surface rounded-lg p-1">
           {TABS.map((t) => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${tab === t ? 'bg-brand-accent text-brand-bg' : 'bg-brand-surface text-brand-text-secondary'}`}>
-              {t}
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className={`rounded-md px-3 py-1.5 text-sm font-semibold flex items-center gap-1.5 transition ${tab === t.id ? 'bg-brand-accent text-brand-bg shadow-sm' : 'text-brand-text-secondary hover:text-brand-text hover:bg-brand-bg'}`}>
+              <span className="text-base">{t.icon}</span>
+              <span>{t.label}</span>
             </button>
           ))}
         </div>

@@ -1,0 +1,1 @@
+- [Email Notification System](email-notification-system.md) — durable queue + templates + worker

@@ -1,0 +1,25 @@
+<!-- Booking Created - Customer -->
+<p style="margin: 0 0 16px; font-size: 16px;">Hi {{customer_name}},</p>
+
+<p style="margin: 0 0 16px; font-size: 16px;">Thank you for booking with <strong>{{brand_name}}</strong>! Your booking has been received and our team will review it shortly.</p>
+
+{% include '_booking_summary.html' %}
+
+{% if ai_diagnosis_summary %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0; border-collapse: collapse;">
+    <tr>
+        <td style="padding: 16px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;">
+            <h3 style="margin: 0 0 8px; font-size: 14px; color: #1e40af;">AI Diagnosis Summary</h3>
+            <p style="margin: 0; font-size: 14px; color: #1e40af;">{{ai_diagnosis_summary}}</p>
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+<p style="margin: 24px 0 16px; font-size: 16px;">We'll notify you once a plumber is assigned to your booking. You can track the status anytime by visiting your account.</p>
+
+{% include '_cta_button.html' with button_url=frontend_url ~ "/account/bookings/" ~ booking_id button_text="View Booking" %}
+
+<p style="margin: 0; font-size: 14px; color: #6b7280;">If you have any questions, please don't hesitate to reach out.</p>
+
+<p style="margin: 16px 0 0; font-size: 16px;">Best regards,<br>The {{brand_name}} Team</p>

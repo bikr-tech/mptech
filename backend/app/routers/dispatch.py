@@ -151,3 +151,80 @@ def plumber_availability(plumber_id: str, on_date: date | None = Query(default=N
         query = query.eq("date", on_date.isoformat())
     res = query.order("date").execute()
     return {"plumber_id": plumber_id, "availability": res.data}
+
+
+@router.get("/email-notifications")
+def list_email_notifications(
+    status: str | None = Query(default=None),
+    notification_type: str | None = Query(default=None),
+    recipient_type: str | None = Query(default=None),
+    limit: int = Query(default=50, le=100),
+    offset: int = Query(default=0, ge=0),
+    user=Depends(require_admin)
+):
+    """List email notifications with filtering for admin monitoring."""
+    db = get_supabase()
+    query = db.table("email_notifications").select("*")
+
+    if status:
+        query = query.eq("status", status)
+    if notification_type:
+        query = query.eq("notification_type", notification_type)
+    if recipient_type:
+        query = query.eq("recipient_type", recipient_type)
+
+    res = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
+    return res.data or []
+
+
+@router.get("/email-notifications/stats")
+def email_notification_stats(user=Depends(require_admin)):
+    """Get email notification statistics for admin dashboard."""
+    db = get_supabase()
+
+    # Total by status
+    statuses = ["queued", "sent", "failed", "skipped"]
+    stats = {}
+    for s in statuses:
+        res = db.table("email_notifications").select("id", count="exact").eq("status", s).execute()
+        stats[s] = res.count or 0
+
+    # Total by type
+    types = [
+        "booking_created", "booking_assigned", "plumber_job_assigned",
+        "booking_scheduled", "booking_rescheduled", "plumber_accepted",
+        "plumber_en_route", "plumber_arrived", "booking_completed",
+        "additional_work_requested", "additional_work_approved", "additional_work_rejected"
+    ]
+    type_stats = {}
+    for t in types:
+        res = db.table("email_notifications").select("id", count="exact").eq("notification_type", t).execute()
+        type_stats[t] = res.count or 0
+
+    # Queue stats
+    queue_res = db.table("email_job_queue").select("status", count="exact").execute()
+    queue_stats = {}
+    for row in queue_res.data or []:
+        queue_stats[row["status"]] = queue_stats.get(row["status"], 0) + 1
+
+    return {
+        "by_status": stats,
+        "by_type": type_stats,
+        "queue": queue_stats,
+    }
+
+
+@router.post("/email-jobs/requeue-dead-letter")
+def requeue_dead_letter_jobs(max_jobs: int = 100, user=Depends(require_admin)):
+    """Requeue dead letter email jobs."""
+    db = get_supabase()
+    res = db.rpc("requeue_dead_letter_jobs", {"max_jobs": max_jobs}).execute()
+    return {"requeued": res.data}
+
+
+@router.post("/email-jobs/cleanup")
+def cleanup_email_jobs(retention_days: int = 30, user=Depends(require_admin)):
+    """Clean up old completed/failed email jobs."""
+    db = get_supabase()
+    res = db.rpc("cleanup_email_jobs", {"retention_days": retention_days}).execute()
+    return {"deleted": res.data}

@@ -19,7 +19,21 @@
       "Bash(python -m pytest tests/test_diagnose.py::test_question_generator_empty_on_error -v)",
       "Bash(python -m pytest tests/ -q)",
       "Bash(curl -s --max-time 200 -X POST -H \"Content-Type: application/json\" -d @resume_body.json http://localhost:8000/api/diagnose/resume)",
-      "Bash(python check_sections.py)"
+      "Bash(python check_sections.py)",
+      "Bash(pip install *)",
+      "Bash(.venv\\\\Scripts\\\\pip install *)",
+      "Bash(python verify_email_flow.py)",
+      "Bash(python -m pytest tests/test_email_queue_service.py tests/test_email_worker.py -v)",
+      "PowerShell(npm run *)",
+      "PowerShell(cd C:\\\\python\\\\mptechsolution\\\\frontend; npx eslint src/components/admin/EmailDashboard.jsx 2>&1; echo \"Exit: $LASTEXITCODE\")",
+      "PowerShell(cd C:\\\\python\\\\mptechsolution\\\\frontend; npx vite build --mode production 2>&1; echo \"Exit: $LASTEXITCODE\")",
+      "PowerShell(cd C:\\\\python\\\\mptechsolution\\\\frontend; $env:NODE_DEBUG=\"vite\"; npx vite build 2>&1)",
+      "Bash(python -m pytest tests/test_diagnose.py -v)",
+      "Bash(python -m pytest tests/test_guardrails.py -v)",
+      "Bash(git --no-pager diff HEAD -- backend/app/diagnosis_graph.py)",
+      "Bash(taskkill /F /IM python.exe)",
+      "Bash(pytest tests/routers/test_diagnose.py)",
+      "Bash(uvicorn app.main:app --reload)"
     ]
   }
 }

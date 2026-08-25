@@ -1,0 +1,20 @@
+Hi {{customer_name}},
+
+Your plumber {{plumber_name}} has accepted the job for booking {{booking_number}}.
+
+Job Confirmed
+=============
+Booking: {{booking_number}}
+Service: {{service_type}}
+Plumber: {{plumber_name}}
+Scheduled: {{scheduled_date}} {{scheduled_time}}
+Status: {{status}}
+
+Your plumber will be on their way soon. You'll receive another notification when they're en route.
+
+Track Progress: {{frontend_url}}/account/bookings/{{booking_id}}
+
+If you have any questions, please don't hesitate to reach out.
+
+Best regards,
+The {{brand_name}} Team

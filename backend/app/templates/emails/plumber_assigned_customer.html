@@ -1,0 +1,14 @@
+<!-- Plumber Assigned - Customer -->
+<p style="margin: 0 0 16px; font-size: 16px;">Hi {{customer_name}},</p>
+
+<p style="margin: 0 0 16px; font-size: 16px;">Great news! A plumber has been assigned to your booking.</p>
+
+{% include '_booking_summary.html' %}
+
+<p style="margin: 24px 0 16px; font-size: 16px;">Your plumber will arrive during the scheduled window. You can track the progress in your account.</p>
+
+{% include '_cta_button.html' with button_url=frontend_url ~ "/account/bookings/" ~ booking_id button_text="Track Booking" %}
+
+<p style="margin: 0; font-size: 14px; color: #6b7280;">If you need to make any changes, please contact us as soon as possible.</p>
+
+<p style="margin: 16px 0 0; font-size: 16px;">Best regards,<br>The {{brand_name}} Team</p>

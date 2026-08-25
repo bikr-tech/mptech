@@ -1,0 +1,31 @@
+<!-- Additional Work Approved - Plumber -->
+<p style="margin: 0 0 16px; font-size: 16px;">Hi {{plumber_name}},</p>
+
+<p style="margin: 0 0 16px; font-size: 16px;">The customer has <strong>approved</strong> the additional work request for booking <strong>{{booking_number}}</strong>.</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0; border-collapse: collapse;">
+    <tr>
+        <td style="padding: 16px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+            <h2 style="margin: 0 0 16px; font-size: 18px; color: #166534;">Approved - Proceed with Work</h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px;">
+                <tr><td style="padding: 4px 0; color: #6b7280; width: 140px;">Booking:</td><td style="padding: 4px 0; font-weight: 600;">{{booking_number}}</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Additional Work:</td><td style="padding: 4px 0;">{{additional_work}}</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Approved Amount:</td><td style="padding: 4px 0; font-weight: 600; color: #1e3a5f;">NPR {{approved_amount}}</td></tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<p style="margin: 24px 0 16px; font-size: 16px;">The additional work has been added to the work order. You may now proceed with the approved work.</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
+    <tr>
+        <td style="text-align: center;">
+            <a href="{{frontend_url}}/plumber/jobs/{{booking_id}}" style="display: inline-block; padding: 12px 24px; background-color: #1e3a5f; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;">View Work Order</a>
+        </td>
+    </tr>
+</table>
+
+<p style="margin: 0; font-size: 14px; color: #6b7280;">Thank you for your work!</p>
+
+<p style="margin: 16px 0 0; font-size: 16px;">Best regards,<br>The {{brand_name}} Team</p>

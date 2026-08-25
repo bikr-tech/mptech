@@ -1,0 +1,32 @@
+Hi {{plumber_name}},
+
+You've been assigned a new plumbing job.
+
+Job Details
+===========
+Booking: {{booking_number}}
+Customer: {{customer_name}}
+Service: {{service_type}}
+Problem: {{problem_description}}
+Address: {{address}}
+Priority: {{priority}}
+Scheduled: {{scheduled_date}} {{scheduled_time}}
+
+{% if required_skills %}
+Required Skills
+===============
+{{required_skills}}
+{% endif %}
+
+{% if work_info %}
+Work Information
+================
+{{work_info}}
+{% endif %}
+
+View Job Details: {{frontend_url}}/plumber/jobs/{{booking_id}}
+
+Please review the job details and confirm your availability.
+
+Best regards,
+The {{brand_name}} Team

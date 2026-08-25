@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 export default function LoginForm({ title = 'Admin Login', initialMode = 'signin' }) {
   const { login, signUp } = useAuth()
+  const navigate = useNavigate()
   const [mode, setMode] = useState(initialMode)
   const [role, setRole] = useState('customer')
   const [email, setEmail] = useState('')
@@ -36,6 +38,18 @@ export default function LoginForm({ title = 'Admin Login', initialMode = 'signin
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
       <form onSubmit={handleSubmit} className="bg-slate-800 border border-slate-700 rounded-2xl p-8 w-full max-w-md">
+        <Link
+          to="/"
+          onClick={(e) => { e.preventDefault(); navigate('/', { replace: true }); }}
+          className="flex items-center gap-2 mb-6 text-brand-accent hover:text-blue-400 transition"
+          aria-label="Go to homepage"
+        >
+          <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span className="text-xl font-bold text-white">MP Tech</span>
+        </Link>
         <h1 className="text-2xl font-bold text-white mb-6 text-center">{title}</h1>
         {error && <p className="text-red-400 text-sm mb-4 text-center">{error}</p>}
         {info && <p className="text-emerald-400 text-sm mb-4 text-center">{info}</p>}

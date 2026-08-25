@@ -1,9 +1,9 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion, DURATIONS, EASES } from '../../lib/animations'
-import { diagnoseStart, diagnoseResume } from '../../lib/api'
+import { diagnoseStart, diagnoseResume, diagnoseVoiceStart } from '../../lib/api'
 import HITLQuestionsModal from './HITLQuestionsModal'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -268,6 +268,109 @@ function UploadZone({ onFileSelected, isDragging, onDragState, disabled }) {
   )
 }
 
+function MicIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3z" />
+      <path d="M19 10v2a7 7 0 01-14 0v-2" />
+      <line x1="12" y1="19" x2="12" y2="22" />
+    </svg>
+  )
+}
+
+function VoiceInputSection({ onVoiceSubmit, isSubmitting }) {
+  const [isListening, setIsListening] = useState(false)
+  const [transcript, setTranscript] = useState('')
+  const [voiceError, setVoiceError] = useState(null)
+  const recognitionRef = useRef(null)
+
+  const getRecognition = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SR) return null
+    return SR
+  }
+
+  const startRecording = () => {
+    const SR = getRecognition()
+    if (!SR) {
+      alert('Voice input is not supported in this browser. Please use Chrome or Edge, or upload a photo above.')
+      return
+    }
+    const recognition = new SR()
+    recognition.continuous = false
+    recognition.interimResults = true
+    recognition.lang = 'en-US'
+
+    recognition.onstart = () => setIsListening(true)
+    recognition.onresult = (event) => {
+      let finalTranscript = ''
+      let interimTranscript = ''
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript
+        else interimTranscript += event.results[i][0].transcript
+      }
+      setTranscript(finalTranscript || interimTranscript)
+    }
+    recognition.onerror = (event) => {
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
+        setVoiceError(`Voice error: ${event.error}. Try typing instead.`)
+      }
+      setIsListening(false)
+    }
+    recognition.onend = () => setIsListening(false)
+
+    recognitionRef.current = recognition
+    setTranscript('')
+    setVoiceError(null)
+    recognition.start()
+  }
+
+  const stopRecording = () => recognitionRef.current?.stop()
+
+  useEffect(() => () => recognitionRef.current?.abort(), [])
+
+  return (
+    <div className="mt-6">
+      <p className="text-white/50 text-[11px] font-mono uppercase tracking-[0.18em] mb-3 text-center">
+        Or Describe It By Voice <span className="text-white/30">(No Photo Needed)</span>
+      </p>
+
+      <button type="button" onClick={isListening ? stopRecording : startRecording}
+        className={`w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl border transition-all ${
+          isListening
+            ? 'bg-emergency-500/20 border-emergency-500/50 ring-2 ring-emergency-500/30'
+            : 'glass-frost bg-white/10 border-white/20 hover:bg-white/15'
+        }`}
+        aria-label={isListening ? 'Stop listening' : 'Start voice input'}>
+        <MicIcon className={`w-5 h-5 ${isListening ? 'text-emergency-400 animate-pulse' : 'text-electric-200'}`} />
+        <span className="text-white font-semibold text-sm">{isListening ? 'Listening… tap to stop' : 'Tap to Speak Your Problem'}</span>
+      </button>
+
+      {(transcript || isListening) && (
+        <div className="glass-frost rounded-xl p-4 mt-3">
+          <textarea
+            value={transcript}
+            onChange={(e) => setTranscript(e.target.value)}
+            placeholder="Your description will appear here…"
+            rows={2}
+            className="w-full bg-transparent text-white text-sm leading-relaxed placeholder-white/30 focus:outline-none resize-none"
+          />
+          {!isListening && transcript.trim() && (
+            <button onClick={() => onVoiceSubmit(transcript)} disabled={isSubmitting}
+              className="w-full btn-3d text-white font-bold py-2.5 px-6 rounded-full text-sm mt-2 transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-40">
+              {isSubmitting ? 'Analyzing…' : 'Analyze My Problem'}
+            </button>
+          )}
+          {!isListening && !transcript && (
+            <p className="text-white/40 text-xs">Didn't catch that — tap the mic and try again.</p>
+          )}
+        </div>
+      )}
+      {voiceError && <p className="text-amber-400 text-xs mt-2 text-center">{voiceError}</p>}
+    </div>
+  )
+}
+
 export default function AIDiagnosisBlock({ content }) {
   const { headline, subheadline, upload_cta, urgency_text } = content || {}
   const [step, setStep] = useState('upload') // upload | analyzing | questions | results | rejected | error
@@ -310,6 +413,9 @@ export default function AIDiagnosisBlock({ content }) {
       if (data.status === 'REJECTED') {
         setResult(data)
         setStep('rejected')
+      } else if (data.error) {
+        setError(data.error)
+        setStep('error')
       } else if (data.status === 'NEEDS_CLARIFICATION') {
         setSession(data)
         setImageUrl(data.image_url || '')
@@ -320,6 +426,34 @@ export default function AIDiagnosisBlock({ content }) {
       }
     } catch (err) {
       setError(err.message || 'Upload failed. Please try again.')
+      setStep('error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleVoiceProblemSubmit(text) {
+    if (!text?.trim()) return
+    setPhase('start')
+    setError(null)
+    setResult(null)
+    setSession(null)
+    setImageUrl('')
+    setFile(null)
+    setStep('analyzing')
+    setSubmitting(true)
+    try {
+      const data = await diagnoseVoiceStart(text)
+      if (data.status === 'NEEDS_CLARIFICATION') {
+        setSession(data)
+        setImageUrl('')
+        setStep('questions')
+      } else {
+        setError(data.error || data.refusal_reason || 'Could not process your description. Please try again.')
+        setStep('error')
+      }
+    } catch (err) {
+      setError(err.message || 'Something went wrong. Please try again.')
       setStep('error')
     } finally {
       setSubmitting(false)
@@ -394,6 +528,12 @@ export default function AIDiagnosisBlock({ content }) {
           {step === 'upload' && (
             <>
               <UploadZone onFileSelected={handleFileSelected} isDragging={false} onDragState={() => {}} />
+
+              {/* Voice input option */}
+              <VoiceInputSection
+                onVoiceSubmit={handleVoiceProblemSubmit}
+                isSubmitting={submitting}
+              />
 
               {/* Step 2 — AUTO-DIAGNOSIS frosted buttons */}
               <div className="mt-6">

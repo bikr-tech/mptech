@@ -13,6 +13,7 @@ from . import audit_service, booking_service
 from .booking_status_service import assert_transition
 from .errors import NotFoundError, PlumberUnavailableError, ScheduleConflictError, InvalidOperationError
 from .plumber_matching_service import verify_assignment
+from .booking_notifications import notify_booking_assigned, notify_booking_scheduled
 
 DEFAULT_TRAVEL_BUFFER_MIN = 30
 
@@ -102,8 +103,12 @@ def assign(db, booking_id: str, plumber_id: str, actor_id: str, actor_role: str,
     audit_service.record_status(booking_id, "scheduled", "assigned", actor_id, actor_role)
     plumber_name = booking_service.get_assigned_plumber_name(db, plumber_id)
 
-    _notify_plumber(db, booking, plumber_id, start, end)
-    _notify_customer(db, booking, start, end)
+    # Enqueue assignment notifications (async, fire-and-forget)
+    try:
+        import asyncio
+        asyncio.create_task(notify_booking_assigned(booking_id, plumber_id, start, end))
+    except RuntimeError:
+        pass
 
     return {
         "booking_id": booking_id,
@@ -148,8 +153,14 @@ def reassign(db, booking_id: str, plumber_id: str, actor_id: str, actor_role: st
     audit_service.record(actor_id, "booking_reassigned", "booking", booking_id,
                          {"assigned_plumber_id": old}, {"assigned_plumber_id": plumber_id})
     plumber_name = booking_service.get_assigned_plumber_name(db, plumber_id)
-    _notify_plumber(db, booking, plumber_id, start, end)
-    _notify_customer(db, booking, start, end)
+
+    # Enqueue reassignment notifications
+    try:
+        import asyncio
+        asyncio.create_task(notify_booking_assigned(booking_id, plumber_id, start, end))
+    except RuntimeError:
+        pass
+
     return {"booking_id": booking_id, "plumber_id": plumber_id, "plumber_name": plumber_name, "status": booking["status"]}
 
 
@@ -192,25 +203,22 @@ def schedule(db, booking_id: str, scheduled_start_at, scheduled_end_at, actor_id
                          None, {"scheduled_start_at": scheduled_start_at.isoformat(),
                                 "scheduled_end_at": scheduled_end_at.isoformat()})
     audit_service.record_status(booking_id, booking["status"], "scheduled", actor_id, actor_role)
-    _notify_plumber(db, booking, booking.get("assigned_plumber_id"), scheduled_start_at, scheduled_end_at)
-    _notify_customer(db, booking, scheduled_start_at, scheduled_end_at)
+
+    # Enqueue scheduling notifications
+    is_reschedule = booking["status"] == "scheduled"
+    try:
+        import asyncio
+        asyncio.create_task(notify_booking_scheduled(booking_id, scheduled_start_at, scheduled_end_at, is_reschedule))
+    except RuntimeError:
+        pass
+
     return {"booking_id": booking_id, "status": "scheduled",
             "scheduled_start_at": scheduled_start_at.isoformat(), "scheduled_end_at": scheduled_end_at.isoformat()}
 
 
 def _notify_plumber(db, booking: dict, plumber_id: str, start, end) -> None:
-    from app.config import settings
-    from .email_service import notify_job_assigned
-    if not settings.resend_api_key or not plumber_id:
-        return
-    pprof = db.table("profiles").select("email").eq("id", plumber_id).single().execute()
-    p_email = pprof.data.get("email") if pprof.data else None
-    if not p_email:
-        return
-    notify_job_assigned(p_email, booking_service.get_assigned_plumber_name(db, plumber_id) or "there",
-                        booking.get("booking_number", ""), booking.get("service_type", ""),
-                        settings.site_url, start.isoformat() if start else None,
-                        end.isoformat() if end else None)
+    """Legacy email function - kept for backward compatibility but notifications now handled by booking_notifications."""
+    pass
 
 
 def _naive(dt) -> datetime | None:
@@ -221,20 +229,8 @@ def _naive(dt) -> datetime | None:
 
 
 def _notify_customer(db, booking: dict, start, end) -> None:
-    """Customer email fires only when the window changed vs their preference."""
-    from app.config import settings
-    from .email_service import notify_visit_scheduled
-    if not settings.resend_api_key:
-        return
-    pref_start, pref_end = _window_from(booking)
-    if _naive(start) != _naive(pref_start) or _naive(end) != _naive(pref_end):
-        cprof = db.table("profiles").select("email,name").eq("id", booking["customer_id"]).single().execute()
-        c_email = cprof.data.get("email") if cprof.data else None
-        if c_email:
-            notify_visit_scheduled(c_email, cprof.data.get("name") or "there",
-                                   booking.get("booking_number", ""), booking["id"],
-                                   booking.get("service_type", ""), start.isoformat(), end.isoformat(),
-                                   settings.site_url)
+    """Legacy email function - kept for backward compatibility but notifications now handled by booking_notifications."""
+    pass
 
 
 def _priority_from_urgency(urgency: str) -> str:

@@ -13,7 +13,7 @@ unvalidated diagnosis. Soft failures degrade to text-only when relevance and
 boxes already passed.
 """
 import json
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -246,7 +246,7 @@ def verify_boxes(validation: DiagnosisValidation, findings: str = "") -> BoxVeri
 Refusal = tuple[None, str, bool]  # (validation, refusal_reason, degraded)
 
 
-def validate_image(image_url: str, findings: str) -> tuple[DiagnosisValidation | None, str | None, bool]:
+def validate_input(image_url: Optional[str], findings: str) -> tuple[DiagnosisValidation | None, str | None, bool]:
     """Run the full guardrail chain. Returns (validation, refusal_reason, degraded).
 
     - hard refuses: irrelevant image, pydantic failure, low VQA support, claim box missing
@@ -254,6 +254,8 @@ def validate_image(image_url: str, findings: str) -> tuple[DiagnosisValidation |
     """
     # 1. Grounding
     try:
+        if not image_url:
+            return None, "No image provided for visual validation.", False
         raw = run_grounding(image_url)
         validation = DiagnosisValidation.model_validate(raw)
     except ValidationError as e:
@@ -270,6 +272,8 @@ def validate_image(image_url: str, findings: str) -> tuple[DiagnosisValidation |
 
     # 3. Woodpecker atomic VQA (hard on contradiction)
     try:
+        if not image_url:
+            return validation, None, True # degrade: VQA requires image, skip if text-only input
         verdicts, ratio = run_woodpecker(image_url, findings)
         validation.vqa_verdict = verdicts
         if ratio < MIN_VQA_SUPPORT_RATIO:
@@ -280,6 +284,8 @@ def validate_image(image_url: str, findings: str) -> tuple[DiagnosisValidation |
         return validation, "We couldn't verify this photo. Please try another one.", False
 
     # 4. Box cross-verification (hard on missing claim box, soft on precision)
+    if not image_url:
+        return validation, None, True # degrade: box verification requires image, skip if text-only input
     bv = verify_boxes(validation, findings)
     if bv.missing_boxes:
         return validation, "We couldn't confirm the issue location in this photo. Please retake a closer photo.", False
