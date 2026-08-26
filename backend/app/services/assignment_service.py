@@ -7,6 +7,7 @@ The final assignment writes bookings.assigned_plumber_id, creates the work_order
 and transitions scheduled→assigned. Double-booking is refused even if two admins
 race (DB trigger reject_booking_overlap_trigger is the hard backstop)."""
 from datetime import datetime, timedelta
+import asyncio
 
 from app.database import get_supabase
 from . import audit_service, booking_service
@@ -104,11 +105,7 @@ def assign(db, booking_id: str, plumber_id: str, actor_id: str, actor_role: str,
     plumber_name = booking_service.get_assigned_plumber_name(db, plumber_id)
 
     # Enqueue assignment notifications (async, fire-and-forget)
-    try:
-        import asyncio
-        asyncio.create_task(notify_booking_assigned(booking_id, plumber_id, start, end))
-    except RuntimeError:
-        pass
+    asyncio.create_task(notify_booking_assigned(booking_id, plumber_id, start, end))
 
     return {
         "booking_id": booking_id,
@@ -155,11 +152,7 @@ def reassign(db, booking_id: str, plumber_id: str, actor_id: str, actor_role: st
     plumber_name = booking_service.get_assigned_plumber_name(db, plumber_id)
 
     # Enqueue reassignment notifications
-    try:
-        import asyncio
-        asyncio.create_task(notify_booking_assigned(booking_id, plumber_id, start, end))
-    except RuntimeError:
-        pass
+    asyncio.create_task(notify_booking_assigned(booking_id, plumber_id, start, end))
 
     return {"booking_id": booking_id, "plumber_id": plumber_id, "plumber_name": plumber_name, "status": booking["status"]}
 
@@ -206,11 +199,7 @@ def schedule(db, booking_id: str, scheduled_start_at, scheduled_end_at, actor_id
 
     # Enqueue scheduling notifications
     is_reschedule = booking["status"] == "scheduled"
-    try:
-        import asyncio
-        asyncio.create_task(notify_booking_scheduled(booking_id, scheduled_start_at, scheduled_end_at, is_reschedule))
-    except RuntimeError:
-        pass
+    asyncio.create_task(notify_booking_scheduled(booking_id, scheduled_start_at, scheduled_end_at, is_reschedule))
 
     return {"booking_id": booking_id, "status": "scheduled",
             "scheduled_start_at": scheduled_start_at.isoformat(), "scheduled_end_at": scheduled_end_at.isoformat()}

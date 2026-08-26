@@ -12,7 +12,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
-from .diagnosis_guardrails import validate_input
+from .diagnosis_guardrails import validate_image
 from .llm_router import invoke_llm, invoke_vision
 
 
@@ -81,7 +81,7 @@ def image_guardrail_node(state: PlumbingHITLState) -> dict:
     frontend never reaches the clarifying-question modal.
     """
     findings = state.get("visual_findings", "")
-    validation, refusal, degraded = validate_input(state.get("image_url"), findings)
+    validation, refusal, degraded = validate_image(state.get("image_url"), findings)
     return {
         "validation": validation.model_dump() if validation else None,
         "refusal_reason": refusal,
@@ -91,13 +91,13 @@ def image_guardrail_node(state: PlumbingHITLState) -> dict:
 
 
 def route_after_guardrail(state: PlumbingHITLState) -> Literal["question_generator", "END"]:
+    # Hard refuse when a refusal reason is set.
+    if state.get("refusal_reason"):
+        return END
+
     # If we have a text description, always proceed to questions/diagnosis.
     if state.get("text_input") or state.get("visual_findings"):
         return "question_generator"
-
-    # Hard refuse when a refusal reason is set for image input.
-    if state.get("refusal_reason"):
-        return END
 
     # For images, proceed if validation passed OR we degraded gracefully.
     if state.get("validation") or state.get("degraded"):

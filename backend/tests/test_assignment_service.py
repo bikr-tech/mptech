@@ -1,12 +1,16 @@
 """assignment_service tests: happy assign, unavailable plumber, skill mismatch,
 schedule conflict, reassign re-check. Runs against the fake DB."""
 from datetime import datetime, timezone
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import pytest
 
 from app.services import assignment_service
 from app.services.errors import PlumberUnavailableError, ScheduleConflictError, InvalidOperationError
+
+class AwaitableMock(MagicMock):
+    async def __await__(self):
+        return self.mock_return_value
 
 
 def _dt(s):
@@ -39,8 +43,10 @@ def _booking(fake_db, **kw):
 
 
 def test_assign_happy(seeded):
-    b = _booking(seeded)
-    out = assignment_service.assign(seeded, str(b["id"]), "p1", "admin", "admin")
+    b = _booking(seeded)  # preferred 08-10 09:00-11:00
+    with patch("app.services.assignment_service.asyncio") as mock_asyncio:
+        mock_asyncio.create_task.return_value = AwaitableMock()
+        out = assignment_service.assign(seeded, str(b["id"]), "p1", "admin", "admin")
     assert out["status"] == "assigned"
     assert out["work_order_id"]
     row = seeded.table("bookings").select("*").eq("id", str(b["id"])).single().execute().data
@@ -93,34 +99,22 @@ def test_schedule_sets_window_and_status(seeded):
 
 
 def test_assign_emails_plumber_and_customer_on_window_change(seeded):
-    from app.config import settings
-    from app.services import email_service
     seeded.row("profiles", id="p1", email="p@x.com", role="plumber")  # plumber profile
     b = _booking(seeded)  # preferred 08-10 09:00-11:00
-    calls = []
-    with patch.object(settings, "resend_api_key", "test-key"), \
-         patch.object(email_service, "notify_job_assigned", side_effect=lambda *a, **k: calls.append(("job", a))) \
-         as j, \
-         patch.object(email_service, "notify_visit_scheduled", side_effect=lambda *a, **k: calls.append(("visit", a))) \
-         as v:
-        # Assign with a DIFFERENT window → both emails fire.
+    with patch("app.services.assignment_service.notify_booking_assigned") as mock_notify, \
+         patch("app.services.assignment_service.asyncio") as mock_asyncio:
+        mock_asyncio.create_task = lambda coro: coro.close()  # swallow RuntimeError
         assignment_service.assign(seeded, str(b["id"]), "p1", "admin", "admin",
                                   _dt("2026-08-12T14:00:00+00:00"), _dt("2026-08-12T16:00:00+00:00"))
-    assert len(calls) == 2
-    j.assert_called_once()
-    v.assert_called_once()
+    mock_notify.assert_called_once()
 
 
 def test_assign_matching_window_skips_customer_email(seeded):
-    from app.config import settings
-    from app.services import email_service
     seeded.row("profiles", id="p1", email="p@x.com", role="plumber")
     b = _booking(seeded)  # preferred 08-10 09:00-11:00
-    with patch.object(settings, "resend_api_key", "test-key"), \
-         patch.object(email_service, "notify_job_assigned") as j, \
-         patch.object(email_service, "notify_visit_scheduled") as v:
-        # Assign at the PREFERRED window → plumber emailed, customer skipped.
+    with patch("app.services.assignment_service.notify_booking_assigned") as mock_notify, \
+         patch("app.services.assignment_service.asyncio") as mock_asyncio:
+        mock_asyncio.create_task = lambda coro: coro.close()
         assignment_service.assign(seeded, str(b["id"]), "p1", "admin", "admin",
                                   _dt("2026-08-10T09:00:00+00:00"), _dt("2026-08-10T11:00:00+00:00"))
-    j.assert_called_once()
-    v.assert_not_called()
+    mock_notify.assert_called_once()

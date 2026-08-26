@@ -246,7 +246,7 @@ def verify_boxes(validation: DiagnosisValidation, findings: str = "") -> BoxVeri
 Refusal = tuple[None, str, bool]  # (validation, refusal_reason, degraded)
 
 
-def validate_input(image_url: Optional[str], findings: str) -> tuple[DiagnosisValidation | None, str | None, bool]:
+def validate_image(image_url: Optional[str], findings: str) -> tuple[DiagnosisValidation | None, str | None, bool]:
     """Run the full guardrail chain. Returns (validation, refusal_reason, degraded).
 
     - hard refuses: irrelevant image, pydantic failure, low VQA support, claim box missing
