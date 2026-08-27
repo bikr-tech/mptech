@@ -8,7 +8,7 @@ from app.email.base import SendResult
 
 
 @pytest.mark.asyncio
-async def test_worker_validates_payload():
+async def test_worker_validates_payload(fake_db):
     """Test that worker validates job payload."""
     worker = EmailWorker(batch_size=1, concurrency=1)
     
@@ -23,7 +23,7 @@ async def test_worker_validates_payload():
 
 
 @pytest.mark.asyncio
-async def test_worker_validates_complete_payload():
+async def test_worker_validates_complete_payload(fake_db):
     """Test that worker accepts valid payload."""
     worker = EmailWorker(batch_size=1, concurrency=1)
     
@@ -42,7 +42,7 @@ async def test_worker_validates_complete_payload():
 
 
 @pytest.mark.asyncio
-async def test_worker_creates_correct_message():
+async def test_worker_creates_correct_message(fake_db):
     """Test that worker creates EmailMessage correctly."""
     worker = EmailWorker(batch_size=1, concurrency=1)
     
@@ -71,7 +71,7 @@ async def test_worker_creates_correct_message():
 
 
 @pytest.mark.asyncio
-async def test_worker_configuration():
+async def test_worker_configuration(fake_db):
     """Test that worker accepts configuration parameters."""
     worker = EmailWorker(
         worker_id="test-worker-1",
@@ -86,7 +86,7 @@ async def test_worker_configuration():
     assert worker.poll_interval == 3.0
 
 
-def test_worker_graceful_shutdown():
+def test_worker_graceful_shutdown(fake_db):
     """Test that worker can be shut down gracefully."""
     worker = EmailWorker()
     assert worker._running == False
@@ -97,7 +97,7 @@ def test_worker_graceful_shutdown():
 
 
 @pytest.mark.asyncio
-async def test_worker_semaphore_concurrency():
+async def test_worker_semaphore_concurrency(fake_db):
     """Test that worker respects concurrency limits."""
     worker = EmailWorker(batch_size=10, concurrency=2)
     

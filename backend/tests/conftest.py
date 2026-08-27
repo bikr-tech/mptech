@@ -43,6 +43,10 @@ class FakeQuery:
         self._update_payload = payload
         return self
 
+    def delete(self):
+        self._mode = "delete"
+        return self
+
     def eq(self, col, val):
         self._rows = [r for r in self._rows if str(r.get(col)) == str(val)]
         return self
@@ -66,28 +70,58 @@ class FakeQuery:
 
     def execute(self):
         if self._mode in ("insert", "upsert"):
-            payload = dict(self._insert_payload)
-            if "id" not in payload:
-                payload["id"] = str(uuid.uuid4())
+            # Handle bulk list inserts vs single item dict inserts
+            raw_payloads = self._insert_payload if isinstance(self._insert_payload, list) else [self._insert_payload]
+            inserted_rows = []
+            
             rows = self.db.tables.setdefault(self.table_name, [])
-            for r in rows:
-                if str(r.get("id")) == str(payload["id"]):
-                    r.update(payload)
-                    return Result([r])
-            rows.append(payload)
-            return Result([payload])
+            for raw in raw_payloads:
+                payload = dict(raw)
+                if "id" not in payload:
+                    payload["id"] = str(uuid.uuid4())
+                
+                # Update existing row if matched by ID
+                match = False
+                for r in rows:
+                    if str(r.get("id")) == str(payload["id"]):
+                        r.update(payload)
+                        inserted_rows.append(r)
+                        match = True
+                        break
+                if not match:
+                    rows.append(payload)
+                    inserted_rows.append(payload)
+
+            if self._single:
+                return Result(inserted_rows[0] if inserted_rows else None)
+            return Result(inserted_rows)
+
         if self._mode == "update":
             for r in self._rows:
                 r.update(self._update_payload)
+            if self._single:
+                return Result(self._rows[0] if self._rows else None)
             return Result(self._rows)
+
+        if self._mode == "delete":
+            table_rows = self.db.tables.get(self.table_name, [])
+            ids_to_remove = {str(r.get("id")) for r in self._rows if "id" in r}
+            deleted_rows = [r for r in table_rows if str(r.get("id")) in ids_to_remove]
+            self.db.tables[self.table_name] = [r for r in table_rows if str(r.get("id")) not in ids_to_remove]
+            if self._single:
+                return Result(deleted_rows[0] if deleted_rows else None)
+            return Result(deleted_rows)
+
         rows = self._rows
         if self._order:
             col, desc = self._order
             rows = sorted(rows, key=lambda r: str(r.get(col, "")), reverse=desc)
         if self._limit:
             rows = rows[: self._limit]
-        return Result(rows[0] if self._single else rows)
-
+            
+        if self._single:
+            return Result(rows[0] if rows else None)
+        return Result(rows)
 
 class FakeDB:
     """Tiny in-memory store. `prevent_booking_overlap` RPC defaults to
@@ -138,6 +172,8 @@ _PATCHED_MODULES = [
     "app.services.availability_service.get_supabase",
     "app.services.plumber_matching_service.get_supabase",
     "app.services.assignment_service.get_supabase",
+    "app.services.email_queue_service.get_supabase",
+    "app.workers.email_worker.get_supabase",
 ]
 
 
