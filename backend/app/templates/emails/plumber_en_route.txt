@@ -1,0 +1,20 @@
+Hi {{customer_name}},
+
+Your plumber {{plumber_name}} is on the way to your location for booking {{booking_number}}.
+
+Plumber En Route
+================
+Booking: {{booking_number}}
+Service: {{service_type}}
+Plumber: {{plumber_name}}
+Address: {{address}}
+Status: {{status}}
+
+Please ensure someone is available at the address. You'll receive another notification when the plumber arrives.
+
+Track Live: {{frontend_url}}/account/bookings/{{booking_id}}
+
+If you need to contact the plumber, please use the app.
+
+Best regards,
+The {{brand_name}} Team

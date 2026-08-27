@@ -1,0 +1,36 @@
+Hi {{customer_name}},
+
+Your plumbing job for booking {{booking_number}} has been completed by {{plumber_name}}.
+
+Job Completed
+=============
+Booking: {{booking_number}}
+Service: {{service_type}}
+Plumber: {{plumber_name}}
+Completed: {{completed_date}} {{completed_time}}
+Status: {{status}}
+
+{% if work_summary %}
+Work Summary
+============
+{{work_summary}}
+{% if materials %}
+Materials: {{materials}}
+{% endif %}
+{% if labor %}
+Labor: {{labor}}
+{% endif %}
+{% if total_amount %}
+Total: NPR {{total_amount}}
+{% endif %}
+{% endif %}
+
+Please review the work and confirm completion in your account:
+{{frontend_url}}/account/bookings/{{booking_id}}
+
+If you have any concerns, please contact us within 48 hours.
+
+Thank you for choosing {{brand_name}}!
+
+Best regards,
+The {{brand_name}} Team

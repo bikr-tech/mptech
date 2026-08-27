@@ -14,8 +14,10 @@ def _content_parts(content):
         if item.get("type") == "text":
             parts.append({"text": item["text"]})
         elif item.get("type") == "image_url" and "data:" in str(item.get("image_url", {}).get("url", "")):
-            data = item["image_url"]["url"].split(",", 1)[1]
-            parts.append({"inline_data": {"mime_type": "image/jpeg", "data": data}})
+            url = item["image_url"]["url"]
+            mime_type = url.split("data:", 1)[1].split(";", 1)[0]
+            data = url.split(",", 1)[1]
+            parts.append({"inline_data": {"mime_type": mime_type, "data": data}})
         else:
             parts.append({"text": str(item)})
     return parts

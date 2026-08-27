@@ -122,7 +122,7 @@ export default function HeroBlock3D({ content, settingsOverrides }) {
               {cta_text || 'Start AI Diagnosis'} <span aria-hidden>→</span>
             </a>
             <a
-              href={secondary_cta_link || '#services'}
+              href={secondary_cta_link || '/book'}
               className="text-white text-base font-medium px-8 py-4 rounded-full border border-white/25 bg-white/5 backdrop-blur-md inline-flex items-center justify-center gap-2 transition-all hover:bg-white/15 hover:scale-[1.03] active:scale-95"
             >
               {secondary_cta_text || 'Book a Plumber'}

@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useRef } from 'react'
-const _cw = console.warn; console.warn = (m, ...a) => { if (`${m}`.includes('THREE.Clock')) return; _cw(m, ...a) }
+const _cw = console.warn; console.warn = (m, ...a) => { if (`${m}`.includes('THREE.Timer')) return; _cw(m, ...a) }
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Float } from '@react-three/drei'
 import { useGSAP } from '@gsap/react'

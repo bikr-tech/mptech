@@ -1,0 +1,23 @@
+Hi {{recipient_name}},
+
+{{action_text}} for booking {{booking_number}}.
+
+Visit Window
+============
+Booking: {{booking_number}}
+Service: {{service_type}}
+{{scheduled_label}}: {{scheduled_date}} {{scheduled_time}}
+Address: {{address}}
+
+{% if plumber_name %}
+Assigned Plumber
+================
+{{plumber_name}}
+{% endif %}
+
+View Details: {{frontend_url}}/{{dashboard_path}}/{{booking_id}}
+
+If you have any questions, please contact us.
+
+Best regards,
+The {{brand_name}} Team

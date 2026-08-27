@@ -1,0 +1,52 @@
+<!-- Admin New Booking -->
+<p style="margin: 0 0 16px; font-size: 16px;">Hi Admin,</p>
+
+<p style="margin: 0 0 16px; font-size: 16px;">A new booking has been created and requires your attention.</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0; border-collapse: collapse;">
+    <tr>
+        <td style="padding: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <h2 style="margin: 0 0 16px; font-size: 18px; color: #1e3a5f;">Booking Details</h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px;">
+                <tr><td style="padding: 4px 0; color: #6b7280; width: 140px;">Booking Number:</td><td style="padding: 4px 0; font-weight: 600;">{{booking_number}}</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Customer:</td><td style="padding: 4px 0;">{{customer_name}} ({{customer_email}})</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Service:</td><td style="padding: 4px 0;">{{service_type}}</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Priority:</td><td style="padding: 4px 0;"><span style="display: inline-block; padding: 2px 8px; background-color: {{priority_color}}; color: white; border-radius: 9999px; font-size: 12px; font-weight: 600;">{{priority}}</span></td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Date/Time:</td><td style="padding: 4px 0;">{{requested_date}} {{requested_time}}</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Location:</td><td style="padding: 4px 0;">{{address}}</td></tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{% if ai_diagnosis_summary %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0; border-collapse: collapse;">
+    <tr>
+        <td style="padding: 16px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;">
+            <h3 style="margin: 0 0 8px; font-size: 14px; color: #1e40af;">AI Diagnosis Summary</h3>
+            <p style="margin: 0; font-size: 14px; color: #1e40af;">{{ai_diagnosis_summary}}</p>
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+{% if required_skills %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0; border-collapse: collapse;">
+    <tr>
+        <td style="padding: 16px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+            <h3 style="margin: 0 0 8px; font-size: 14px; color: #166534;">Required Skills</h3>
+            <p style="margin: 0; font-size: 14px; color: #166534;">{{required_skills}}</p>
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
+    <tr>
+        <td style="text-align: center;">
+            <a href="{{frontend_url}}/admin/bookings/{{booking_id}}" style="display: inline-block; padding: 12px 24px; background-color: #1e3a5f; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;">View in Admin Panel</a>
+        </td>
+    </tr>
+</table>
+
+<p style="margin: 0; font-size: 14px; color: #6b7280;">This is an automated notification from the {{brand_name}} booking system.</p>

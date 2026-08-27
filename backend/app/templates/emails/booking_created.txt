@@ -1,0 +1,28 @@
+Hi {{customer_name}},
+
+Thank you for booking with {{brand_name}}! Your booking has been received and our team will review it shortly.
+
+Booking Summary
+===============
+Booking Number: {{booking_number}}
+Service: {{service_type}}
+Problem: {{problem_description}}
+Requested Date: {{requested_date}}
+Requested Time: {{requested_time}}
+Address: {{address}}
+Priority: {{priority}}
+Status: {{status}}
+
+{% if ai_diagnosis_summary %}
+AI Diagnosis Summary
+====================
+{{ai_diagnosis_summary}}
+{% endif %}
+
+We'll notify you once a plumber is assigned to your booking. You can track the status anytime by visiting:
+{{frontend_url}}/account/bookings/{{booking_id}}
+
+If you have any questions, please don't hesitate to reach out.
+
+Best regards,
+The {{brand_name}} Team

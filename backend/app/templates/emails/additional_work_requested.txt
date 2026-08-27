@@ -1,0 +1,22 @@
+Hi {{customer_name}},
+
+Your plumber {{plumber_name}} has requested additional work for booking {{booking_number}}.
+
+Additional Work Request
+=======================
+Booking: {{booking_number}}
+Original Service: {{original_service}}
+Additional Work: {{additional_work}}
+Reason: {{reason}}
+Materials: {{materials}}
+Labor: {{labor}}
+Estimated Total: NPR {{estimated_total}}
+
+Your explicit approval is required before any additional work begins. This work will not be billed unless you approve it.
+
+Review & Decide: {{frontend_url}}/bookings/{{booking_id}}/additional-work/{{request_id}}
+
+Please review the details and make your decision. You can approve or reject this request.
+
+Best regards,
+The {{brand_name}} Team

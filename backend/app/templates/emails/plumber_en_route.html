@@ -1,0 +1,33 @@
+<!-- Plumber En Route - Customer -->
+<p style="margin: 0 0 16px; font-size: 16px;">Hi {{customer_name}},</p>
+
+<p style="margin: 0 0 16px; font-size: 16px;">Your plumber <strong>{{plumber_name}}</strong> is on the way to your location for booking <strong>{{booking_number}}</strong>.</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0; border-collapse: collapse;">
+    <tr>
+        <td style="padding: 16px; background-color: #dbeafe; border: 1px solid #93c5fd; border-radius: 8px;">
+            <h2 style="margin: 0 0 16px; font-size: 18px; color: #1e40af;">Plumber En Route</h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px;">
+                <tr><td style="padding: 4px 0; color: #6b7280; width: 140px;">Booking:</td><td style="padding: 4px 0; font-weight: 600;">{{booking_number}}</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Service:</td><td style="padding: 4px 0;">{{service_type}}</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Plumber:</td><td style="padding: 4px 0;">{{plumber_name}}</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Address:</td><td style="padding: 4px 0;">{{address}}</td></tr>
+                <tr><td style="padding: 4px 0; color: #6b7280;">Status:</td><td style="padding: 4px 0;"><span style="display: inline-block; padding: 2px 8px; background-color: #3b82f6; color: white; border-radius: 9999px; font-size: 12px; font-weight: 600;">{{status}}</span></td></tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<p style="margin: 24px 0 16px; font-size: 16px;">Please ensure someone is available at the address. You'll receive another notification when the plumber arrives.</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
+    <tr>
+        <td style="text-align: center;">
+            <a href="{{frontend_url}}/account/bookings/{{booking_id}}" style="display: inline-block; padding: 12px 24px; background-color: #1e3a5f; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;">Track Live</a>
+        </td>
+    </tr>
+</table>
+
+<p style="margin: 0; font-size: 14px; color: #6b7280;">If you need to contact the plumber, please use the app.</p>
+
+<p style="margin: 16px 0 0; font-size: 16px;">Best regards,<br>The {{brand_name}} Team</p>

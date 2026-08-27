@@ -1,0 +1,18 @@
+Hi {{plumber_name}},
+
+The customer has approved the additional work request for booking {{booking_number}}.
+
+Approved - Proceed with Work
+============================
+Booking: {{booking_number}}
+Additional Work: {{additional_work}}
+Approved Amount: NPR {{approved_amount}}
+
+The additional work has been added to the work order. You may now proceed with the approved work.
+
+View Work Order: {{frontend_url}}/plumber/jobs/{{booking_id}}
+
+Thank you for your work!
+
+Best regards,
+The {{brand_name}} Team

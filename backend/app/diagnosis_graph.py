@@ -18,7 +18,8 @@ from .llm_router import invoke_llm, invoke_vision
 
 class PlumbingHITLState(TypedDict):
     thread_id: str
-    image_url: str
+    image_url: Optional[str]
+    text_input: Optional[str]
     visual_findings: str
     validation: Optional[dict]           # DiagnosisValidation as dict
     box_verification: Optional[dict]     # BoxVerification as dict
@@ -51,7 +52,13 @@ Note anything ambiguous or unseen. Keep it factual and concise. Do NOT guess a d
 
 
 def visual_inspection_node(state: PlumbingHITLState) -> dict:
+    if state.get("text_input"):
+        return {"visual_findings": state["text_input"], "error": None}
+
     image_url = state["image_url"]
+    if not image_url:
+        return {"visual_findings": "", "error": "No image or text input provided"}
+
     prompt = [
         {"role": "user", "content": [
             {"type": "text", "text": VISION_PROMPT},
@@ -74,7 +81,7 @@ def image_guardrail_node(state: PlumbingHITLState) -> dict:
     frontend never reaches the clarifying-question modal.
     """
     findings = state.get("visual_findings", "")
-    validation, refusal, degraded = validate_image(state["image_url"], findings)
+    validation, refusal, degraded = validate_image(state.get("image_url"), findings)
     return {
         "validation": validation.model_dump() if validation else None,
         "refusal_reason": refusal,
@@ -84,9 +91,19 @@ def image_guardrail_node(state: PlumbingHITLState) -> dict:
 
 
 def route_after_guardrail(state: PlumbingHITLState) -> Literal["question_generator", "END"]:
-    if state.get("refusal_reason") or not state.get("validation"):
+    # Hard refuse when a refusal reason is set.
+    if state.get("refusal_reason"):
         return END
-    return "question_generator"
+
+    # If we have a text description, always proceed to questions/diagnosis.
+    if state.get("text_input") or state.get("visual_findings"):
+        return "question_generator"
+
+    # For images, proceed if validation passed OR we degraded gracefully.
+    if state.get("validation") or state.get("degraded"):
+        return "question_generator"
+
+    return END
 
 
 # ── Node 3: question generator ─────────────────────────────────────────────
@@ -103,7 +120,17 @@ Visual inspection:
 {findings}"""
     try:
         data = extract_json(invoke_llm([{"role": "user", "content": prompt}]))
-        questions = data if isinstance(data, list) else data.get("questions", [])
+        if isinstance(data, dict):
+            # LLM sometimes nests the list or returns {q1: ..., q2: ...} directly.
+            raw = next(
+                (data[k] for k in ("questions", "clarifying_questions") if isinstance(data.get(k), list)),
+                [v for v in data.values() if isinstance(v, str)],
+            )
+        else:
+            raw = data if isinstance(data, list) else []
+        questions = [str(q).strip() for q in raw if str(q).strip()]
+        if not questions:
+            raise ValueError(f"no questions parsed from LLM output: {str(data)[:200]}")
         return {"clarifying_questions": questions[:3]}
     except Exception as e:
         return {"clarifying_questions": [], "error": f"Question generation failed: {e}"}
@@ -196,7 +223,11 @@ def build_diagnosis_graph():
     builder.add_node("cost_estimator", cost_estimator_node)
 
     builder.add_edge(START, "visual_inspection")
-    builder.add_edge("visual_inspection", "image_guardrail")
+    builder.add_conditional_edges(
+        "visual_inspection",
+        lambda state: "image_guardrail" if state.get("image_url") else "question_generator",
+        {"image_guardrail": "image_guardrail", "question_generator": "question_generator"}
+    )
     builder.add_conditional_edges(
         "image_guardrail", route_after_guardrail,
         {"question_generator": "question_generator", END: END},

@@ -1,0 +1,19 @@
+<!-- Booking Summary - Reusable Component -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0; border-collapse: collapse;">
+    <tr>
+        <td style="padding: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <h2 style="margin: 0 0 16px; font-size: 18px; color: #1e3a5f;">Booking Summary</h2>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px;">
+                {% if booking_number %}<tr><td style="padding: 4px 0; color: #6b7280; width: 140px;">Booking #:</td><td style="padding: 4px 0; font-weight: 600;">{{booking_number}}</td></tr>{% endif %}
+                {% if service_type %}<tr><td style="padding: 4px 0; color: #6b7280;">Service:</td><td style="padding: 4px 0;">{{service_type}}</td></tr>{% endif %}
+                {% if problem_description %}<tr><td style="padding: 4px 0; color: #6b7280;">Problem:</td><td style="padding: 4px 0;">{{problem_description}}</td></tr>{% endif %}
+                {% if scheduled_date %}<tr><td style="padding: 4px 0; color: #6b7280;">Scheduled:</td><td style="padding: 4px 0;">{{scheduled_date}}{% if scheduled_time %} at {{scheduled_time}}{% endif %}</td></tr>{% endif %}
+                {% if requested_date %}<tr><td style="padding: 4px 0; color: #6b7280;">Requested:</td><td style="padding: 4px 0;">{{requested_date}}{% if requested_time %} at {{requested_time}}{% endif %}</td></tr>{% endif %}
+                {% if address %}<tr><td style="padding: 4px 0; color: #6b7280;">Address:</td><td style="padding: 4px 0;">{{address}}</td></tr>{% endif %}
+                {% if priority %}<tr><td style="padding: 4px 0; color: #6b7280;">Priority:</td><td style="padding: 4px 0;">{{priority}}</td></tr>{% endif %}
+                {% if status %}<tr><td style="padding: 4px 0; color: #6b7280;">Status:</td><td style="padding: 4px 0;">{% include '_status_badge.html' %}</td></tr>{% endif %}
+                {% if assigned_to %}<tr><td style="padding: 4px 0; color: #6b7280;">Assigned To:</td><td style="padding: 4px 0;">{{assigned_to}}</td></tr>{% endif %}
+            </table>
+        </td>
+    </tr>
+</table>

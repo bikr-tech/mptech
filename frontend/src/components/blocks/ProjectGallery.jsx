@@ -434,7 +434,7 @@ export default function ProjectGallery({ content }) {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
               <a
                 ref={emeraldBtnRef}
-                href="#plumbers"
+                href="/book"
                 className="btn-emerald inline-flex items-center gap-2 text-base font-bold px-9 py-4 rounded-full transition-all hover:-translate-y-0.5 hover:scale-[1.04] active:scale-95"
               >
                 Book a Plumber

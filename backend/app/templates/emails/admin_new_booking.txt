@@ -1,0 +1,28 @@
+Hi Admin,
+
+A new booking has been created and requires your attention.
+
+Booking Details
+===============
+Booking Number: {{booking_number}}
+Customer: {{customer_name}} ({{customer_email}})
+Service: {{service_type}}
+Priority: {{priority}}
+Date/Time: {{requested_date}} {{requested_time}}
+Location: {{address}}
+
+{% if ai_diagnosis_summary %}
+AI Diagnosis Summary
+====================
+{{ai_diagnosis_summary}}
+{% endif %}
+
+{% if required_skills %}
+Required Skills
+===============
+{{required_skills}}
+{% endif %}
+
+View in Admin Panel: {{frontend_url}}/admin/bookings/{{booking_id}}
+
+This is an automated notification from the {{brand_name}} booking system.
